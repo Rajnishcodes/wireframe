@@ -1,0 +1,384 @@
+/* ==========================================================
+   Executive OS - Calendar
+   Lavender Theme
+========================================================== */
+
+/* =========================
+   Page
+========================= */
+
+.calendar-page,
+.container-fluid {
+  background: #f8f9fc;
+}
+
+/* =========================
+   Header
+========================= */
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.calendar-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #8b5cf6, #b388ff);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 15px 35px rgba(139, 92, 246, .25);
+}
+
+.calendar-icon svg {
+  font-size: 34px !important;
+}
+
+.title {
+  font-weight: 700 !important;
+  color: #1f2937;
+}
+
+.subtitle {
+  color: #7c7c95;
+  margin-top: 4px !important;
+}
+
+/* =========================
+   Button
+========================= */
+
+.new-event-btn {
+  background: linear-gradient(135deg, #8b5cf6, #a855f7) !important;
+  border-radius: 14px !important;
+  padding: 12px 22px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  box-shadow: 0 15px 35px rgba(139,92,246,.25) !important;
+}
+
+.new-event-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* =========================
+   Calendar Card
+========================= */
+
+.calendar-card {
+  background: white;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 15px 40px rgba(0,0,0,.05);
+  border: 1px solid #ede9fe;
+}
+
+/* =========================
+   Top Bar
+========================= */
+
+.calendar-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* =========================
+   Month Control
+========================= */
+
+.month-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.month-control h4 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.month-control .MuiIconButton-root {
+  background: #f4f0ff;
+}
+
+.month-control .MuiIconButton-root:hover {
+  background: #ede9fe;
+}
+
+/* =========================
+   View Buttons
+========================= */
+
+.view-buttons {
+  display: flex;
+  gap: 10px;
+  background: #f8f8fc;
+  padding: 6px;
+  border-radius: 16px;
+}
+
+.view-btn {
+  border: none;
+  padding: 10px 18px;
+  border-radius: 12px;
+  background: transparent;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: .3s;
+}
+
+.view-btn:hover {
+  background: #ede9fe;
+}
+
+.active-view {
+  background: linear-gradient(135deg,#8b5cf6,#a855f7);
+  color: white;
+}
+
+/* =========================
+   Week Names
+========================= */
+
+.calendar-days {
+  margin-bottom: 15px;
+}
+
+.day-name {
+  text-align: center;
+  font-size: 13px;
+  color: #8b8b9a;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 10px;
+}
+
+/* =========================
+   Calendar Cell
+========================= */
+
+.calendar-column {
+  margin-bottom: 15px;
+}
+
+.calendar-day {
+  min-height: 120px;
+  border-radius: 18px;
+  border: 1px solid #ece9f7;
+  background: white;
+  padding: 12px;
+  transition: .3s;
+}
+
+.calendar-day:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(139,92,246,.10);
+}
+
+/* =========================
+   Today
+========================= */
+
+.today {
+  background: #f4f0ff;
+  border: 2px solid #8b5cf6;
+}
+
+/* =========================
+   Date Number
+========================= */
+
+.date-number {
+  font-size: 15px;
+  font-weight: 700;
+  color: #4b5563;
+  margin-bottom: 10px;
+}
+
+.today .date-number {
+  color: #8b5cf6;
+}
+
+/* =========================
+   Events
+========================= */
+
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* =========================
+   Event Chips
+========================= */
+
+.event-chip {
+  width: 100%;
+  justify-content: flex-start !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+}
+
+/* Lavender */
+
+.event-chip.violet {
+  background: #ede9fe !important;
+  color: #7c3aed !important;
+}
+
+/* Green */
+
+.event-chip.green {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+}
+
+/* Orange */
+
+.event-chip.orange {
+  background: #ffedd5 !important;
+  color: #ea580c !important;
+}
+
+/* Red */
+
+.event-chip.red {
+  background: #ffe4e6 !important;
+  color: #e11d48 !important;
+}
+
+/* =========================
+   Scroll
+========================= */
+
+.calendar-card::-webkit-scrollbar {
+  width: 8px;
+}
+
+.calendar-card::-webkit-scrollbar-thumb {
+  background: #d8c4ff;
+  border-radius: 20px;
+}
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width:992px){
+
+.calendar-top{
+flex-direction:column;
+align-items:flex-start;
+}
+
+.calendar-header{
+flex-direction:column;
+align-items:flex-start;
+}
+
+}
+
+@media (max-width:768px){
+
+.calendar-card{
+padding:18px;
+}
+
+.calendar-icon{
+width:54px;
+height:54px;
+}
+
+.calendar-icon svg{
+font-size:28px !important;
+}
+
+.title{
+font-size:28px !important;
+}
+
+.month-control h4{
+font-size:18px;
+}
+
+.view-buttons{
+width:100%;
+justify-content:space-between;
+}
+
+.view-btn{
+flex:1;
+}
+
+.calendar-day{
+min-height:100px;
+}
+
+}
+
+@media (max-width:576px){
+
+.calendar-header{
+gap:15px;
+}
+
+.header-left{
+align-items:flex-start;
+}
+
+.calendar-card{
+padding:15px;
+}
+
+.day-name{
+font-size:11px;
+}
+
+.date-number{
+font-size:13px;
+}
+
+.event-chip{
+font-size:10px !important;
+}
+
+}
+
+/* =========================
+   Selected day
+========================= */
+
+.calendar-day.selected {
+  border: 2px solid #a855f7;
+}
+
+/* =========================
+   Day view empty state
+========================= */
+
+.muted-empty {
+  color: #9ca3af;
+  font-size: 13px;
+  font-style: italic;
+}

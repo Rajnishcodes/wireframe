@@ -1,0 +1,351 @@
+/* ==========================================================
+   Executive OS - Documents
+   Lavender Theme
+========================================================== */
+
+/* ===========================
+   Page
+=========================== */
+
+.container-fluid {
+    background: #F8F9FC;
+    min-height: 100vh;
+}
+
+/* ===========================
+   Header
+=========================== */
+
+.documents-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.documents-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.documents-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #8B5CF6, #A855F7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    box-shadow: 0 18px 35px rgba(139,92,246,.25);
+}
+
+.documents-icon svg {
+    font-size: 34px !important;
+}
+
+.page-title {
+    font-weight: 700 !important;
+    color: #1F2937;
+}
+
+.page-subtitle {
+    margin-top: 4px !important;
+    color: #8B8CA7;
+}
+
+/* ===========================
+   Upload Button
+=========================== */
+
+.upload-btn {
+    background: linear-gradient(135deg,#8B5CF6,#A855F7) !important;
+    border-radius: 14px !important;
+    text-transform: none !important;
+    padding: 12px 24px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 15px 30px rgba(139,92,246,.25);
+}
+
+.upload-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* ===========================
+   Folder Cards
+=========================== */
+
+.folder-card {
+    height: 170px;
+    border-radius: 24px;
+    padding: 25px;
+    cursor: pointer;
+    transition: .35s;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,.7);
+    box-shadow: 0 15px 35px rgba(0,0,0,.05);
+}
+
+.folder-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(139,92,246,.12);
+}
+
+.folder-icon {
+    font-size: 42px !important;
+    color: #6D28D9;
+}
+
+.folder-name {
+    margin-top: 18px !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+}
+
+.folder-count {
+    margin-top: 6px !important;
+    color: #6B7280;
+    font-size: 14px !important;
+}
+
+/* Folder Colors */
+
+.folder-violet {
+    background: linear-gradient(135deg,#DDD6FE,#F5F3FF);
+}
+
+.folder-green {
+    background: linear-gradient(135deg,#D1FAE5,#ECFDF5);
+}
+
+.folder-red {
+    background: linear-gradient(135deg,#FFE4E6,#FFF1F2);
+}
+
+.folder-orange {
+    background: linear-gradient(135deg,#FED7AA,#FFF7ED);
+}
+
+/* ===========================
+   Recent Files Card
+=========================== */
+
+.documents-card {
+    background: #fff;
+    border-radius: 24px;
+    padding: 28px;
+    border: 1px solid #ECE9F7;
+    box-shadow: 0 15px 35px rgba(0,0,0,.05);
+}
+
+/* ===========================
+   Card Header
+=========================== */
+
+.documents-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.recent-title {
+    font-weight: 700 !important;
+}
+
+.view-all-btn {
+    color: #8B5CF6 !important;
+    text-transform: none !important;
+    font-weight: 600 !important;
+}
+
+/* ===========================
+   File List
+=========================== */
+
+.file-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.file-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 0;
+    border-bottom: 1px solid #F1F1F4;
+    transition: .3s;
+}
+
+.file-row:last-child {
+    border-bottom: none;
+}
+
+.file-row:hover {
+    background: #FAFAFF;
+    border-radius: 14px;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+/* ===========================
+   File Icon
+=========================== */
+
+.file-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.file-icon svg {
+    font-size: 28px !important;
+}
+
+/* PDF */
+
+.file-icon.pdf {
+    background: #FFE4E6;
+    color: #E11D48;
+}
+
+/* Slides */
+
+.file-icon.slides {
+    background: #FFEDD5;
+    color: #EA580C;
+}
+
+/* Word */
+
+.file-icon.doc {
+    background: #DBEAFE;
+    color: #2563EB;
+}
+
+/* Excel */
+
+.file-icon.sheet {
+    background: #DCFCE7;
+    color: #15803D;
+}
+
+/* ===========================
+   File Details
+=========================== */
+
+.file-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.file-name {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #1F2937;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-meta {
+    margin-top: 5px !important;
+    color: #8B8CA7;
+    font-size: 13px !important;
+}
+
+/* ===========================
+   Actions
+=========================== */
+
+.action-btn {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 12px !important;
+    color: #8B5CF6 !important;
+}
+
+.action-btn:hover {
+    background: #F3EEFF !important;
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media (max-width:992px){
+
+.documents-header{
+flex-direction:column;
+align-items:flex-start;
+}
+
+.documents-card-header{
+flex-direction:column;
+align-items:flex-start;
+gap:12px;
+}
+
+}
+
+@media (max-width:768px){
+
+.documents-card{
+padding:20px;
+}
+
+.documents-icon{
+width:58px;
+height:58px;
+}
+
+.documents-icon svg{
+font-size:30px !important;
+}
+
+.folder-card{
+height:150px;
+}
+
+.file-row{
+gap:12px;
+}
+
+}
+
+@media (max-width:576px){
+
+.documents-left{
+align-items:flex-start;
+}
+
+.page-title{
+font-size:28px !important;
+}
+
+.folder-card{
+height:auto;
+padding:20px;
+}
+
+.file-row{
+flex-wrap:wrap;
+}
+
+.file-info{
+width:100%;
+}
+
+.action-btn{
+margin-top:8px;
+}
+
+}

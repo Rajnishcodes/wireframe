@@ -1,0 +1,190 @@
+/* ============ Header Left (icon + title group) — collision-proof replacement for Bootstrap .row ============ */
+.rem-header-left {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 16px;
+  margin: 0;
+}
+
+/* Collision-proof replacement for "row gap-2" in modal footer actions */
+.rem-footer-actions {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* ============ Reminder List ============ */
+.rem-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rem-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.8);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+}
+.rem-item:hover {
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(124,58,237,0.08);
+}
+
+.rem-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: #EDE9FE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.rem-icon-box svg { display: block; }
+
+.rem-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+.rem-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--muted-foreground, #6B6580);
+  margin-top: 2px;
+}
+.rem-time svg { display: block; flex-shrink: 0; }
+
+.rem-priority-chip {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.tone-rose    { background: #FFE4E6; color: #BE123C; }
+.tone-amber   { background: #FEF3C7; color: #B45309; }
+.tone-emerald { background: #D1FAE5; color: #047857; }
+
+.rem-icon-action {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: none;
+  color: rgba(30,27,46,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+.rem-icon-action:hover { background: var(--muted, #F3F0FB); color: #7C3AED; }
+
+.rem-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+/* ============ Kebab Menu ============ */
+.rem-menu-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.rem-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 200px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(30,27,46,0.18);
+  padding: 6px;
+  z-index: 20;
+}
+
+.rem-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  border: none;
+  background: none;
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #1E1B2E;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease;
+}
+.rem-menu-item:hover { background: var(--muted, #F3F0FB); }
+.rem-menu-item-danger { color: #DC2626; }
+.rem-menu-item-danger:hover { background: #FEF2F2; }
+
+/* ============ Toast ============ */
+.rem-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1E1B2E;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+  z-index: 60;
+  animation: rem-toast-in 0.25s ease;
+}
+@keyframes rem-toast-in {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.rem-toast-undo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.rem-toast-undo:hover { background: rgba(255,255,255,0.25); }
+
+/* ============ Responsive ============ */
+@media (max-width: 560px) {
+  .rem-item { flex-wrap: wrap; }
+  .rem-priority-chip { order: 1; }
+}
