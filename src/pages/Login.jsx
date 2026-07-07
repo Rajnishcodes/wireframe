@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   WorkspacePremiumRounded,
   Visibility,
@@ -10,6 +11,8 @@ import {
 import "../styles/Login.css";
 
 export default function LoginPage({ onLogin }) {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -28,11 +31,34 @@ export default function LoginPage({ onLogin }) {
 
     setLoading(true);
 
-    // Placeholder for real auth call — replace with your API request
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      // Placeholder for real auth call — replace this block with your
+      // actual API request once the backend is connected, e.g.:
+      //
+      // const res = await fetch("http://localhost:5000/api/auth/login", {
+      //   method: "POST",
+      //   credentials: "include", // required so the httpOnly cookie is sent/received
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ email, password }),
+      // });
+      // const data = await res.json();
+      // if (!res.ok) throw new Error(data.message || "Login failed");
+
+      await new Promise((resolve) => setTimeout(resolve, 900));
+
+      // Temporary stand-in for real auth state until backend is wired up
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userEmail", email);
+
       if (onLogin) onLogin({ email, remember });
-    }, 900);
+
+      // This is the actual fix — redirect after a successful login
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

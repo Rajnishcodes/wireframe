@@ -13,6 +13,8 @@
 
   --shadow: 0 20px 45px rgba(0,0,0,.06);
   --transition: .30s ease;
+
+  --sb-font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
 /* ==========================================================
@@ -44,6 +46,7 @@
   transition:width var(--transition);
   position:relative;
   box-sizing:border-box;
+  font-family:var(--sb-font);
 }
 
 .sb-sidebar.sb-collapsed{
@@ -113,20 +116,23 @@
   font-size:20px;
   font-weight:800;
   color:var(--text-primary);
-  letter-spacing:-.5px;
+  letter-spacing:-.02em;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+  font-family:var(--sb-font);
 }
 
 .sb-logo-text span{
   display:block;
   margin-top:2px;
   font-size:12px;
+  font-weight:500;
   color:var(--text-secondary);
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+  font-family:var(--sb-font);
 }
 
 /* ==========================================================
@@ -229,6 +235,7 @@
   color:var(--text-secondary) !important;
   overflow:hidden;
   box-sizing:border-box;
+  font-family:var(--sb-font) !important;
 }
 
 .sb-item:hover{
@@ -276,10 +283,11 @@
 .sb-text .MuiTypography-root{
   font-size:15px;
   font-weight:600;
-  letter-spacing:.2px;
+  letter-spacing:-.01em;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+  font-family:var(--sb-font) !important;
 }
 
 .sb-item.sb-active .sb-text{
@@ -294,7 +302,6 @@
   border-radius:18px;
 }
 
-/* Active dot indicator */
 .sb-active-indicator{
   position:absolute;
   right:14px;
@@ -358,6 +365,7 @@
   transition:all .30s ease !important;
   color:var(--text-secondary) !important;
   box-sizing:border-box;
+  font-family:var(--sb-font) !important;
 }
 
 .sb-subitem:hover{
@@ -398,6 +406,7 @@
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+  font-family:var(--sb-font) !important;
 }
 
 /* ==========================================================
@@ -415,6 +424,8 @@
 .MuiTooltip-tooltip{
   background:#222 !important;
   font-size:13px !important;
+  font-weight:500 !important;
+  font-family:var(--sb-font) !important;
   border-radius:10px !important;
   padding:8px 12px !important;
 }
@@ -457,51 +468,29 @@
    RESPONSIVE
 ========================================================== */
 
-/* ---- Base / Desktop (1200px+) ----
-   Uses default rules above — full sidebar, 280px, all labels visible
-*/
-
-/* ---- Large Desktop (1600px+) — slightly roomier ---- */
 @media(min-width:1600px){
-  .sb-desktop-wrapper{
-    top:24px;
-    left:24px;
-    bottom:24px;
-  }
   .sb-sidebar{ width:300px; }
   .sb-sidebar.sb-collapsed{ width:95px; }
-  .sb-item{ height:58px; }
 }
 
-/* ---- Toggle point: desktop sidebar <-> mobile drawer ---- */
 @media(min-width:992px){
   .sb-mobile-menu-btn{ display:none !important; }
   .sb-desktop-wrapper{ display:block; }
 }
 
-/* ---- Laptop / small desktop (992px - 1199px) — slightly narrower sidebar ---- */
 @media(max-width:1199px) and (min-width:992px){
   .sb-sidebar{ width:250px; }
   .sb-sidebar.sb-collapsed{ width:80px; }
-  .sb-desktop-wrapper{
-    top:16px;
-    left:16px;
-    bottom:16px;
-  }
 }
 
-/* ---- Tablet and below: switch to mobile drawer ---- */
 @media(max-width:991px){
   .sb-desktop-wrapper{ display:none; }
-
   .sb-mobile-menu-btn{
     display:flex !important;
     justify-content:center;
     align-items:center;
   }
 
-  /* Drawer sidebar should always show full labels — collapsing
-     doesn't make sense inside an already-narrow mobile drawer */
   .MuiDrawer-paper .sb-sidebar.sb-collapsed{
     width:280px;
   }
@@ -522,13 +511,11 @@
   }
 }
 
-/* ---- Tablet portrait ---- */
 @media(max-width:768px){
   .MuiDrawer-paper{ width:300px !important; }
   .sb-sidebar{ width:300px; }
 }
 
-/* ---- Mobile ---- */
 @media(max-width:576px){
   .MuiDrawer-paper{ width:280px !important; }
   .sb-sidebar{ width:280px; }
@@ -546,7 +533,6 @@
   }
 }
 
-/* ---- Extra small mobile ---- */
 @media(max-width:400px){
   .MuiDrawer-paper{ width:250px !important; }
   .sb-sidebar{ width:250px; }

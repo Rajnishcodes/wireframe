@@ -15,6 +15,7 @@ import DashboardLayout from "./components/DashboardLayout";
 import SettingsPage from "./pages/SettingsPage";
 import MyProfile from "./pages/MyProfile";
 import AccountSettings from "./pages/AccountSettings";
+import Onedrive from "./pages/Onedrive";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
           <Route path="/settings"   element={<SettingsPage />} />
           <Route path="/profile"   element={<MyProfile />} />
           <Route path="/accountsettings"   element={<AccountSettings />} />
+          <Route path="/onedrive"   element={<Onedrive />} />
         </Route>
       </Routes>
     </BrowserRouter>

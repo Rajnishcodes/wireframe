@@ -1,3 +1,7 @@
+:root {
+  --header-font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
 /* ===========================================
    HEADER
 =========================================== */
@@ -25,6 +29,8 @@
     width:100%;
 
     gap:16px;
+
+    font-family:var(--header-font);
 
 }
 
@@ -61,6 +67,10 @@
 
     text-overflow:ellipsis;
 
+    font-family:var(--header-font);
+
+    letter-spacing:-0.02em;
+
 }
 
 .header-left p{
@@ -76,6 +86,10 @@
     overflow:hidden;
 
     text-overflow:ellipsis;
+
+    font-family:var(--header-font);
+
+    font-weight:500;
 
 }
 
@@ -114,6 +128,22 @@
     border-radius:14px;
 
     background:#F8F8FD;
+
+    font-family:var(--header-font);
+
+}
+
+.search-box input{
+
+    font-family:var(--header-font);
+
+    font-weight:500;
+
+}
+
+.search-box input::placeholder{
+
+    font-family:var(--header-font);
 
 }
 
@@ -181,6 +211,10 @@
 
     text-overflow:ellipsis;
 
+    font-family:var(--header-font);
+
+    letter-spacing:-0.01em;
+
 }
 
 .profile-info span{
@@ -194,6 +228,24 @@
     overflow:hidden;
 
     text-overflow:ellipsis;
+
+    font-family:var(--header-font);
+
+    font-weight:500;
+
+}
+
+/* ===========================================
+   MENU ITEMS (dropdowns)
+=========================================== */
+
+.MuiMenuItem-root{
+
+    font-family:var(--header-font) !important;
+
+    font-weight:500 !important;
+
+    font-size:14px !important;
 
 }
 

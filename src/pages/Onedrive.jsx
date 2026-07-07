@@ -3,7 +3,17 @@ import { useNavigate } from "react-router-dom";
 
 import "../styles/Sidebar.css";
 
-import { Avatar, IconButton } from "@mui/material";
+import {
+  Avatar,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  InputAdornment,
+} from "@mui/material";
 
 import {
   ChevronLeft,
@@ -18,14 +28,25 @@ import {
   WorkspacePremiumRounded,
   TrendingUpRounded,
   CloudRounded,
+  Email,
+  Lock,
+  Visibility,
+  VisibilityOff,
 } from "@mui/icons-material";
 
-import SidebarItem from "./SidebarItem";
+import SidebarItem from "../components/SidebarItem";
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
   const navigate = useNavigate();
 
   const [active, setActive] = useState("dashboard");
+
+  // OneDrive login modal state
+  const [oneDriveDialogOpen, setOneDriveDialogOpen] = useState(false);
+  const [oneDriveEmail, setOneDriveEmail] = useState("");
+  const [oneDrivePassword, setOneDrivePassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [oneDriveError, setOneDriveError] = useState("");
 
   const menuItems = [
     {
@@ -73,24 +94,50 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
   const handleMenuClick = (item) => {
     setActive(item.id);
 
-    // Open OneDrive in a new tab
+    // OneDrive now opens a credentials modal instead of launching directly
     if (item.id === "onedrive") {
-      window.open(
-        "https://www.office.com/launch/onedrive",
-        "_blank",
-        "noopener,noreferrer"
-      );
+      setOneDriveError("");
+      setOneDriveDialogOpen(true);
       return;
     }
 
-    // Settings page (if you create it later)
     if (item.id === "settings") {
       navigate("/settings");
       return;
     }
 
-    // All other pages
     navigate(`/${item.id}`);
+  };
+
+  const closeOneDriveDialog = () => {
+    setOneDriveDialogOpen(false);
+    setOneDriveEmail("");
+    setOneDrivePassword("");
+    setShowPassword(false);
+    setOneDriveError("");
+  };
+
+  const handleOneDriveSubmit = (e) => {
+    e.preventDefault();
+
+    if (!oneDriveEmail.trim() || !oneDrivePassword.trim()) {
+      setOneDriveError("Please enter both your email and password.");
+      return;
+    }
+
+    // NOTE: this does not actually authenticate with Microsoft — it simply
+    // captures credentials in the UI before opening the OneDrive site.
+    // Real Microsoft sign-in happens on Microsoft's own login page once
+    // OneDrive opens in a new tab.
+    closeOneDriveDialog();
+
+    // Opens in whatever browser the user is currently using — a webpage
+    // cannot force a different browser to open due to browser security rules.
+    window.open(
+      "https://www.office.com/launch/onedrive",
+      "_blank",
+      "noopener,noreferrer"
+    );
   };
 
   return (
@@ -209,6 +256,78 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
         </div>
 
       </div>
+
+      {/* =========================
+          ONEDRIVE LOGIN MODAL
+      ========================== */}
+
+      <Dialog open={oneDriveDialogOpen} onClose={closeOneDriveDialog} fullWidth maxWidth="xs">
+        <form onSubmit={handleOneDriveSubmit}>
+          <DialogTitle>Sign in to OneDrive</DialogTitle>
+
+          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
+            <TextField
+              label="Email or Phone"
+              type="email"
+              size="small"
+              value={oneDriveEmail}
+              onChange={(e) => setOneDriveEmail(e.target.value)}
+              autoFocus
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email style={{ fontSize: 18, color: "#9CA3AF" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <TextField
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              size="small"
+              value={oneDrivePassword}
+              onChange={(e) => setOneDrivePassword(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock style={{ fontSize: 18, color: "#9CA3AF" }} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      size="small"
+                      onClick={() => setShowPassword((v) => !v)}
+                      edge="end"
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <VisibilityOff style={{ fontSize: 18 }} /> : <Visibility style={{ fontSize: 18 }} />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            {oneDriveError && (
+              <div style={{ color: "#DC2626", fontSize: "0.8125rem", fontWeight: 500 }}>
+                {oneDriveError}
+              </div>
+            )}
+
+            <p style={{ margin: 0, fontSize: "0.75rem", color: "#9CA3AF" }}>
+              This opens OneDrive in a new tab in your current browser, where you'll complete sign-in securely on Microsoft's own login page.
+            </p>
+          </DialogContent>
+
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button onClick={closeOneDriveDialog}>Cancel</Button>
+            <Button type="submit" variant="contained">
+              Sign In
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
 
     </aside>
   );

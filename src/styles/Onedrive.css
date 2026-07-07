@@ -1,0 +1,493 @@
+:root {
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 90px;
+
+  --sidebar-bg: #FFFFFF;
+  --sidebar-border: #ECE9F7;
+
+  --primary: #8B5CF6;
+  --primary-light: #F4F0FF;
+
+  --text-primary: #1E1B2E;
+  --text-secondary: #7A7A90;
+
+  --shadow: 0 20px 45px rgba(0,0,0,.06);
+  --transition: .30s ease;
+}
+
+/* ==========================================================
+   Desktop Sidebar Wrapper
+========================================================== */
+
+.desktop-sidebar{
+  position:fixed;
+  top:20px;
+  left:20px;
+  bottom:20px;
+  z-index:1000;
+}
+
+/* ==========================================================
+   Sidebar Container
+========================================================== */
+
+.sidebar{
+  width:var(--sidebar-width);
+  height:calc(100vh - 40px);
+  display:flex;
+  flex-direction:column;
+  background:var(--sidebar-bg);
+  border:1px solid var(--sidebar-border);
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  transition:width var(--transition);
+  position:relative;
+  box-sizing:border-box;
+}
+
+.sidebar.collapsed{
+  width:var(--sidebar-collapsed-width);
+}
+
+/* ==========================================================
+   Sidebar Header (Logo + Collapse Button)
+========================================================== */
+
+.sidebar-header{
+  padding:24px 20px;
+  min-height:92px;
+  display:flex;
+  align-items:center;
+  transition:all var(--transition);
+  box-sizing:border-box;
+  flex-shrink:0;
+}
+
+.header-top{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  min-width:0;
+}
+
+/* ==========================================================
+   Logo
+========================================================== */
+
+.logo-wrapper{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  overflow:hidden;
+  min-width:0;
+}
+
+.logo-icon{
+  width:44px;
+  height:44px;
+  min-width:44px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg, #8B5CF6, #A855F7);
+  color:#ffffff;
+  box-shadow:0 10px 25px rgba(139,92,246,.30);
+  flex-shrink:0;
+}
+
+.logo-icon svg{
+  font-size:22px;
+}
+
+.logo-text{
+  overflow:hidden;
+  white-space:nowrap;
+  min-width:0;
+}
+
+.logo-text h2{
+  margin:0;
+  font-size:19px;
+  font-weight:800;
+  color:var(--text-primary);
+  letter-spacing:-.5px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.logo-text span{
+  display:block;
+  margin-top:2px;
+  font-size:11.5px;
+  color:var(--text-secondary);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* ==========================================================
+   Collapsed Header
+========================================================== */
+
+.sidebar.collapsed .sidebar-header{
+  padding:24px 10px;
+}
+
+.sidebar.collapsed .header-top{
+  flex-direction:column;
+  gap:16px;
+  justify-content:center;
+}
+
+.sidebar.collapsed .logo-wrapper{
+  justify-content:center;
+}
+
+/* ==========================================================
+   Collapse Button
+========================================================== */
+
+.collapse-btn{
+  width:38px !important;
+  height:38px !important;
+  min-width:38px !important;
+  border-radius:12px !important;
+  background:#F6F4FF !important;
+  color:var(--primary) !important;
+  transition:all .30s ease !important;
+  flex-shrink:0;
+}
+
+.collapse-btn:hover{
+  background:#EEE8FF !important;
+  transform:rotate(180deg);
+}
+
+/* ==========================================================
+   Workspace Card
+========================================================== */
+
+.workspace-card{
+  margin:0 16px 16px;
+  padding:16px;
+  border-radius:18px;
+  background:linear-gradient(135deg, #8B5CF6, #A855F7);
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  flex-shrink:0;
+  box-shadow:0 15px 30px rgba(139,92,246,.28);
+}
+
+.workspace-icon{
+  width:36px;
+  height:36px;
+  min-width:36px;
+  border-radius:10px;
+  background:rgba(255,255,255,.20);
+  color:#ffffff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.workspace-icon svg{
+  font-size:18px;
+}
+
+.workspace-content{
+  flex:1;
+  min-width:0;
+}
+
+.workspace-content h4{
+  margin:0;
+  font-size:13px;
+  font-weight:700;
+  color:#ffffff;
+}
+
+.workspace-content p{
+  margin:2px 0 8px;
+  font-size:11.5px;
+  color:rgba(255,255,255,.85);
+}
+
+.workspace-progress{
+  width:100%;
+  height:6px;
+  border-radius:20px;
+  background:rgba(255,255,255,.25);
+  overflow:hidden;
+}
+
+.workspace-progress-fill{
+  width:92%;
+  height:100%;
+  border-radius:20px;
+  background:#ffffff;
+}
+
+/* ==========================================================
+   Section Title (MAIN MENU)
+========================================================== */
+
+.sidebar-section-title{
+  padding:0 24px;
+  margin-bottom:10px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.08em;
+  color:var(--text-secondary);
+  flex-shrink:0;
+}
+
+/* ==========================================================
+   Navigation Container
+========================================================== */
+
+.sidebar-menu{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:0 14px 14px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  box-sizing:border-box;
+}
+
+.sidebar.collapsed .sidebar-menu{
+  padding:0 10px 14px;
+  align-items:center;
+}
+
+/* ==========================================================
+   Scrollbar
+========================================================== */
+
+.sidebar-menu::-webkit-scrollbar{
+  width:6px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb{
+  background:#D8CFFB;
+  border-radius:20px;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb:hover{
+  background:#BDA8FF;
+}
+
+.sidebar-menu{
+  scrollbar-width:thin;
+  scrollbar-color:#D8CFFB transparent;
+}
+
+/* ==========================================================
+   Sidebar Item
+========================================================== */
+
+.sidebar-item{
+  position:relative;
+  width:100%;
+  height:54px;
+  border-radius:16px !important;
+  display:flex !important;
+  align-items:center;
+  padding:0 16px !important;
+  transition:background .30s ease, color .30s ease, transform .30s ease, box-shadow .30s ease !important;
+  color:var(--text-secondary) !important;
+  overflow:hidden;
+  box-sizing:border-box;
+}
+
+.sidebar-item:hover{
+  background:#F5F2FF !important;
+  color:var(--primary) !important;
+  transform:translateX(5px);
+}
+
+.sidebar-item.active{
+  background:linear-gradient(135deg, #8B5CF6, #A855F7) !important;
+  color:#ffffff !important;
+  box-shadow:0 15px 35px rgba(139,92,246,.30);
+}
+
+.sidebar-item.active::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:10px;
+  width:5px;
+  height:34px;
+  border-radius:20px;
+  background:#ffffff;
+}
+
+.sidebar-icon{
+  min-width:44px !important;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:inherit !important;
+  flex-shrink:0;
+}
+
+.sidebar-icon svg{
+  font-size:22px !important;
+}
+
+.sidebar-text{
+  color:inherit !important;
+  overflow:hidden;
+  min-width:0;
+}
+
+.sidebar-text .MuiTypography-root{
+  font-size:14.5px;
+  font-weight:600;
+  letter-spacing:.2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.sidebar-item.active .sidebar-text{
+  color:#ffffff !important;
+}
+
+.sidebar-item.active .sidebar-icon{
+  color:#ffffff !important;
+}
+
+.sidebar-item .MuiTouchRipple-root{
+  border-radius:16px;
+}
+
+/* ==========================================================
+   Collapsed Sidebar Items
+========================================================== */
+
+.sidebar.collapsed .sidebar-item{
+  width:46px;
+  height:46px;
+  justify-content:center;
+  padding:0 !important;
+  margin:0 auto;
+}
+
+.sidebar.collapsed .sidebar-icon{
+  min-width:auto !important;
+}
+
+.sidebar.collapsed .sidebar-text{
+  display:none;
+}
+
+.sidebar.collapsed .sidebar-item:hover{
+  transform:none;
+}
+
+/* ==========================================================
+   Footer / User Profile
+========================================================== */
+
+.sidebar-footer{
+  padding:16px;
+  border-top:1px solid var(--sidebar-border);
+  flex-shrink:0;
+  box-sizing:border-box;
+}
+
+.sidebar-profile{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:8px;
+  border-radius:16px;
+  cursor:pointer;
+  transition:background .2s ease;
+}
+
+.sidebar-profile:hover{
+  background:var(--primary-light);
+}
+
+.sidebar.collapsed .sidebar-profile{
+  justify-content:center;
+  padding:4px;
+}
+
+.sidebar-profile-info{
+  min-width:0;
+  overflow:hidden;
+}
+
+.sidebar-profile-info h4{
+  margin:0;
+  font-size:14px;
+  font-weight:700;
+  color:var(--text-primary);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.sidebar-profile-info span{
+  font-size:11.5px;
+  color:var(--text-secondary);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* ==========================================================
+   Tooltip
+========================================================== */
+
+.MuiTooltip-tooltip{
+  background:#222 !important;
+  font-size:13px !important;
+  border-radius:10px !important;
+  padding:8px 12px !important;
+}
+
+/* ==========================================================
+   Drawer Override (mobile)
+========================================================== */
+
+.MuiDrawer-paper{
+  border:none !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+.MuiDrawer-paper .sidebar{
+  height:100vh;
+  border-radius:0;
+  border:none;
+}
+
+/* ==========================================================
+   Mobile Menu Button
+========================================================== */
+
+.mobile-menu-btn{
+  position:fixed !important;
+  top:18px;
+  left:18px;
+  z-index:1500;
+  width:52px !important;
+  height:52px !important;
+  border-radius:16px

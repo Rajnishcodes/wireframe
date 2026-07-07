@@ -16,6 +16,7 @@ import {
   StickyNote2Rounded,
   SettingsRounded,
   WorkspacePremiumRounded,
+  CloudRounded,
 } from "@mui/icons-material";
 
 import SidebarItem from "./SidebarItem";
@@ -32,8 +33,25 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
     { id: "tasks", title: "Tasks", icon: <AssignmentRounded /> },
     { id: "reminders", title: "Reminders", icon: <NotificationsRounded /> },
     { id: "notes", title: "Notes", icon: <StickyNote2Rounded /> },
+    { id: "onedrive", title: "OneDrive", icon: <CloudRounded /> },
     { id: "settings", title: "Settings", icon: <SettingsRounded /> },
   ];
+
+  const handleMenuClick = (item) => {
+    setActive(item.id);
+
+    // OneDrive opens externally in a new tab instead of routing internally
+    if (item.id === "onedrive") {
+      window.open(
+        "https://www.office.com/launch/onedrive",
+        "_blank",
+        "noopener,noreferrer"
+      );
+      return;
+    }
+
+    navigate(`/${item.id}`);
+  };
 
   return (
     <aside className={`sb-sidebar ${collapsed ? "sb-collapsed" : ""}`}>
@@ -74,10 +92,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
             title={item.title}
             collapsed={collapsed}
             active={active === item.id}
-            onClick={() => {
-              setActive(item.id);
-              navigate(`/${item.id}`);
-            }}
+            onClick={() => handleMenuClick(item)}
           />
         ))}
       </div>
