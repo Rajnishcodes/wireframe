@@ -12,6 +12,9 @@ import Reminders from "./pages/Reminders";
 import Task from "./pages/Task";
 
 import DashboardLayout from "./components/DashboardLayout";
+import SettingsPage from "./pages/SettingsPage";
+import MyProfile from "./pages/MyProfile";
+import AccountSettings from "./pages/AccountSettings";
 
 function App() {
   return (
@@ -30,6 +33,9 @@ function App() {
           <Route path="/notes"      element={<Notes />} />
           <Route path="/reminders"  element={<Reminders />} />
           <Route path="/tasks"      element={<Task />} />
+          <Route path="/settings"   element={<SettingsPage />} />
+          <Route path="/profile"   element={<MyProfile />} />
+          <Route path="/accountsettings"   element={<AccountSettings />} />
         </Route>
       </Routes>
     </BrowserRouter>

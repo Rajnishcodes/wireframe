@@ -76,10 +76,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
             active={active === item.id}
             onClick={() => {
               setActive(item.id);
-
-              if (item.id !== "settings") {
-                navigate(`/${item.id}`);
-              }
+              navigate(`/${item.id}`);
             }}
           />
         ))}

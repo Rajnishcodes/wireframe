@@ -41,8 +41,9 @@
   border-radius:0px;
   overflow:hidden;
   box-shadow:var(--shadow);
-  transition:all var(--transition);
+  transition:width var(--transition);
   position:relative;
+  box-sizing:border-box;
 }
 
 .sb-sidebar.sb-collapsed{
@@ -59,6 +60,7 @@
   display:flex;
   align-items:center;
   transition:all var(--transition);
+  box-sizing:border-box;
 }
 
 .sb-header-top{
@@ -67,6 +69,7 @@
   align-items:center;
   justify-content:space-between;
   gap:12px;
+  min-width:0;
 }
 
 /* ==========================================================
@@ -78,6 +81,7 @@
   align-items:center;
   gap:12px;
   overflow:hidden;
+  min-width:0;
 }
 
 .sb-logo-icon{
@@ -91,6 +95,7 @@
   background:linear-gradient(135deg, #8B5CF6, #A855F7);
   color:#ffffff;
   box-shadow:0 10px 25px rgba(139,92,246,.30);
+  flex-shrink:0;
 }
 
 .sb-logo-icon svg{
@@ -100,6 +105,7 @@
 .sb-logo-text{
   overflow:hidden;
   white-space:nowrap;
+  min-width:0;
 }
 
 .sb-logo-text h2{
@@ -163,7 +169,6 @@
 
 /* ==========================================================
    Navigation Container
-   (fixed: no hardcoded padding-left — was breaking collapsed view)
 ========================================================== */
 
 .sb-menu{
@@ -174,6 +179,7 @@
   padding:22px 14px;
   overflow-y:auto;
   overflow-x:hidden;
+  box-sizing:border-box;
 }
 
 .sb-sidebar.sb-collapsed .sb-menu{
@@ -208,7 +214,7 @@
 }
 
 /* ==========================================================
-   Sidebar Item (SidebarItem.jsx / SidebarGroup.jsx main button)
+   Sidebar Item
 ========================================================== */
 
 .sb-item{
@@ -219,9 +225,10 @@
   display:flex !important;
   align-items:center;
   padding:0 18px !important;
-  transition:all .30s ease !important;
+  transition:background .30s ease, color .30s ease, transform .30s ease, box-shadow .30s ease !important;
   color:var(--text-secondary) !important;
   overflow:hidden;
+  box-sizing:border-box;
 }
 
 .sb-item:hover{
@@ -253,6 +260,7 @@
   justify-content:center;
   align-items:center;
   color:inherit !important;
+  flex-shrink:0;
 }
 
 .sb-icon svg{
@@ -261,12 +269,17 @@
 
 .sb-text{
   color:inherit !important;
+  overflow:hidden;
+  min-width:0;
 }
 
 .sb-text .MuiTypography-root{
   font-size:15px;
   font-weight:600;
   letter-spacing:.2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .sb-item.sb-active .sb-text{
@@ -281,7 +294,7 @@
   border-radius:18px;
 }
 
-/* Active dot indicator (used in SidebarItem.jsx) */
+/* Active dot indicator */
 .sb-active-indicator{
   position:absolute;
   right:14px;
@@ -289,11 +302,11 @@
   height:8px;
   border-radius:50%;
   background:#ffffff;
+  flex-shrink:0;
 }
 
 /* ==========================================================
    Collapsed Sidebar Items
-   (icon-only, centered, no leftover text/margin)
 ========================================================== */
 
 .sb-sidebar.sb-collapsed .sb-item{
@@ -317,7 +330,7 @@
 }
 
 /* ==========================================================
-   Sidebar Group (SidebarGroup.jsx)
+   Sidebar Group
 ========================================================== */
 
 .sb-group{
@@ -344,6 +357,7 @@
   border-radius:14px !important;
   transition:all .30s ease !important;
   color:var(--text-secondary) !important;
+  box-sizing:border-box;
 }
 
 .sb-subitem:hover{
@@ -371,6 +385,7 @@
 .sb-subicon{
   min-width:42px !important;
   color:inherit !important;
+  flex-shrink:0;
 }
 
 .sb-subicon svg{
@@ -380,10 +395,13 @@
 .sb-subitem .MuiTypography-root{
   font-size:14px;
   font-weight:500;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 /* ==========================================================
-   Collapse Animation (MUI Collapse component)
+   Collapse Animation
 ========================================================== */
 
 .MuiCollapse-root{
@@ -391,7 +409,7 @@
 }
 
 /* ==========================================================
-   Tooltip (shown on collapsed item hover)
+   Tooltip
 ========================================================== */
 
 .MuiTooltip-tooltip{
@@ -436,32 +454,107 @@
 }
 
 /* ==========================================================
-   Responsive
+   RESPONSIVE
 ========================================================== */
 
+/* ---- Base / Desktop (1200px+) ----
+   Uses default rules above — full sidebar, 280px, all labels visible
+*/
+
+/* ---- Large Desktop (1600px+) — slightly roomier ---- */
+@media(min-width:1600px){
+  .sb-desktop-wrapper{
+    top:24px;
+    left:24px;
+    bottom:24px;
+  }
+  .sb-sidebar{ width:300px; }
+  .sb-sidebar.sb-collapsed{ width:95px; }
+  .sb-item{ height:58px; }
+}
+
+/* ---- Toggle point: desktop sidebar <-> mobile drawer ---- */
 @media(min-width:992px){
   .sb-mobile-menu-btn{ display:none !important; }
   .sb-desktop-wrapper{ display:block; }
 }
 
+/* ---- Laptop / small desktop (992px - 1199px) — slightly narrower sidebar ---- */
+@media(max-width:1199px) and (min-width:992px){
+  .sb-sidebar{ width:250px; }
+  .sb-sidebar.sb-collapsed{ width:80px; }
+  .sb-desktop-wrapper{
+    top:16px;
+    left:16px;
+    bottom:16px;
+  }
+}
+
+/* ---- Tablet and below: switch to mobile drawer ---- */
 @media(max-width:991px){
   .sb-desktop-wrapper{ display:none; }
+
   .sb-mobile-menu-btn{
     display:flex !important;
     justify-content:center;
     align-items:center;
   }
+
+  /* Drawer sidebar should always show full labels — collapsing
+     doesn't make sense inside an already-narrow mobile drawer */
+  .MuiDrawer-paper .sb-sidebar.sb-collapsed{
+    width:280px;
+  }
+  .MuiDrawer-paper .sb-sidebar.sb-collapsed .sb-header-top{
+    flex-direction:row;
+  }
+  .MuiDrawer-paper .sb-sidebar.sb-collapsed .sb-logo-text{
+    display:block;
+  }
+  .MuiDrawer-paper .sb-sidebar.sb-collapsed .sb-text{
+    display:block;
+  }
+  .MuiDrawer-paper .sb-sidebar.sb-collapsed .sb-item{
+    width:100%;
+    justify-content:flex-start;
+    padding:0 18px !important;
+    margin:0;
+  }
 }
 
+/* ---- Tablet portrait ---- */
+@media(max-width:768px){
+  .MuiDrawer-paper{ width:300px !important; }
+  .sb-sidebar{ width:300px; }
+}
+
+/* ---- Mobile ---- */
 @media(max-width:576px){
   .MuiDrawer-paper{ width:280px !important; }
   .sb-sidebar{ width:280px; }
-  .sb-header{ padding:22px 18px; }
+  .sb-header{ padding:20px 18px; min-height:80px; }
+  .sb-logo-icon{ width:40px; height:40px; min-width:40px; }
+  .sb-logo-text h2{ font-size:18px; }
+  .sb-menu{ padding:16px 12px; }
+  .sb-item{ height:52px; }
+
+  .sb-mobile-menu-btn{
+    width:46px !important;
+    height:46px !important;
+    top:14px;
+    left:14px;
+  }
 }
 
-@media(min-width:1600px){
-  .sb-sidebar{ width:300px; }
-  .sb-sidebar.sb-collapsed{ width:95px; }
+/* ---- Extra small mobile ---- */
+@media(max-width:400px){
+  .MuiDrawer-paper{ width:250px !important; }
+  .sb-sidebar{ width:250px; }
+  .sb-header{ padding:16px 14px; min-height:72px; }
+  .sb-item{ height:48px; padding:0 14px !important; }
+  .sb-icon{ min-width:40px !important; }
+  .sb-icon svg{ font-size:22px !important; }
+  .sb-text .MuiTypography-root{ font-size:14px; }
 }
 
 /* ==========================================================

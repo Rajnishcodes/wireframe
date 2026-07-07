@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/Header.css";
 
 import {
@@ -19,6 +20,8 @@ import {
 } from "@mui/material";
 
 export default function Header() {
+  const navigate = useNavigate();
+
   const [profileAnchor, setProfileAnchor] = useState(null);
   const [notificationAnchor, setNotificationAnchor] = useState(null);
   const [settingsAnchor, setSettingsAnchor] = useState(null);
@@ -33,6 +36,30 @@ export default function Header() {
   // Full user name lives here — swap this out for your actual auth/user data later
   const userFullName = "John Doe";
   const userFirstName = userFullName.split(" ")[0];
+
+  const closeProfileMenu = () => setProfileAnchor(null);
+  const closeSettingsMenu = () => setSettingsAnchor(null);
+
+  const goToProfile = () => {
+    closeProfileMenu();
+    navigate("/profile");
+  };
+
+  const goToAccountSettings = () => {
+    closeProfileMenu();
+    navigate("/account-settings");
+  };
+
+  const handleLogout = () => {
+    closeProfileMenu();
+    // Placeholder — wire this to your real auth/logout logic later
+    navigate("/login");
+  };
+
+  const goToSettingsPage = () => {
+    closeSettingsMenu();
+    navigate("/settings");
+  };
 
   return (
     <header className="header">
@@ -91,11 +118,11 @@ export default function Header() {
         <MuiMenu
           anchorEl={settingsAnchor}
           open={Boolean(settingsAnchor)}
-          onClose={() => setSettingsAnchor(null)}
+          onClose={closeSettingsMenu}
         >
-          <MenuItem>Profile Settings</MenuItem>
-          <MenuItem>Preferences</MenuItem>
-          <MenuItem>Security</MenuItem>
+          <MenuItem onClick={goToSettingsPage}>Profile Settings</MenuItem>
+          <MenuItem onClick={goToSettingsPage}>Preferences</MenuItem>
+          <MenuItem onClick={goToSettingsPage}>Security</MenuItem>
         </MuiMenu>
 
         {/* Profile */}
@@ -119,11 +146,11 @@ export default function Header() {
         <MuiMenu
           anchorEl={profileAnchor}
           open={Boolean(profileAnchor)}
-          onClose={() => setProfileAnchor(null)}
+          onClose={closeProfileMenu}
         >
-          <MenuItem>My Profile</MenuItem>
-          <MenuItem>Account Settings</MenuItem>
-          <MenuItem>Logout</MenuItem>
+          <MenuItem onClick={goToProfile}>My Profile</MenuItem>
+          <MenuItem onClick={goToAccountSettings}>Account Settings</MenuItem>
+          <MenuItem onClick={handleLogout}>Logout</MenuItem>
         </MuiMenu>
 
       </div>

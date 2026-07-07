@@ -1,0 +1,192 @@
+/* ============ Header ============ */
+.profile-header-left {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 16px;
+}
+.profile-header-actions {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 8px;
+}
+
+/* ============ Layout ============ */
+.profile-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .profile-layout { grid-template-columns: 1fr; }
+}
+
+.profile-main-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* ============ Side card ============ */
+.profile-side-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.profile-avatar-wrap {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin-bottom: 16px;
+}
+.profile-avatar-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #fff;
+  box-shadow: 0 10px 24px rgba(124,58,237,0.18);
+}
+.profile-avatar-upload {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #7C3AED;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid #fff;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.profile-name-row h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.profile-role-badge {
+  margin: 6px 0 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #7C3AED;
+  background: #F4F0FF;
+  padding: 4px 14px;
+  border-radius: 999px;
+}
+
+.profile-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border, #E9E5F5);
+  margin: 20px 0;
+}
+
+.profile-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+}
+.profile-info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8125rem;
+  color: var(--foreground, #1E1B2E);
+}
+.profile-info-item span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ============ Bio / edit form ============ */
+.profile-bio {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--foreground, #1E1B2E);
+  margin: 0;
+}
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 560px) {
+  .profile-form-grid { grid-template-columns: 1fr; }
+}
+.profile-bio-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border, #E9E5F5);
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+  outline: none;
+}
+.profile-bio-input:focus { border-color: #A78BFA; }
+
+/* ============ Activity stats ============ */
+.profile-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 640px) {
+  .profile-stats-grid { grid-template-columns: 1fr; }
+}
+.profile-stat-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.prof-tint-violet  { background: linear-gradient(135deg, rgba(196,181,253,0.7), rgba(237,233,254,0.4)); }
+.prof-tint-emerald { background: linear-gradient(135deg, rgba(167,243,208,0.6), rgba(209,250,229,0.3)); }
+.prof-tint-amber   { background: linear-gradient(135deg, rgba(253,230,138,0.6), rgba(254,243,199,0.3)); }
+
+/* ============ Activity list ============ */
+.profile-activity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.profile-activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.profile-activity-dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-radius: 50%;
+  background: #7C3AED;
+  margin-top: 6px;
+}
+.profile-activity-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+}

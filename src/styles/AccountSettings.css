@@ -1,0 +1,174 @@
+/* ============ Header ============ */
+.acct-header-left {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 16px;
+}
+
+/* ============ Grid ============ */
+.acct-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .acct-grid { grid-template-columns: 1fr; }
+}
+
+/* ============ Verification rows ============ */
+.acct-verify-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border, #E9E5F5);
+}
+.acct-verify-row:last-child { border-bottom: none; }
+.acct-verify-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 12px;
+  background: var(--muted, #F3F0FB);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.acct-verify-title { font-weight: 600; font-size: 0.875rem; }
+.acct-verified-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #047857;
+  background: #D1FAE5;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ============ Sessions ============ */
+.acct-session-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.acct-session-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.8);
+}
+.acct-session-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 12px;
+  background: var(--muted, #F3F0FB);
+  color: #7C3AED;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.acct-session-device {
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.acct-current-tag {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #6D28D9;
+  background: #EDE9FE;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.acct-revoke-btn {
+  border: none;
+  background: none;
+  color: #DC2626;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+.acct-revoke-btn:hover { background: #FEF2F2; }
+
+/* ============ Billing ============ */
+.acct-plan-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #EDE9FE, #FAF5FF);
+}
+.acct-plan-name { font-weight: 700; font-size: 1rem; }
+
+.acct-payment-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 12px 0;
+}
+
+.acct-billing-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.acct-billing-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.8);
+  flex-wrap: wrap;
+}
+.acct-billing-plan { font-weight: 600; font-size: 0.8125rem; }
+.acct-billing-amount { font-weight: 700; font-size: 0.875rem; white-space: nowrap; }
+
+/* ============ Data & privacy ============ */
+.acct-data-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border, #E9E5F5);
+  flex-wrap: wrap;
+}
+.acct-data-row:last-of-type { border-bottom: none; }
+
+.acct-danger-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}

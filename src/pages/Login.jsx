@@ -1,255 +1,161 @@
-import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 import {
-  ArrowForward,
-  ArrowBack,
-  Lock,
+  WorkspacePremiumRounded,
   Visibility,
   VisibilityOff,
-  CheckCircle,
-  Bolt,
-  Insights,
-  Shield,
+  Email,
+  Lock,
 } from "@mui/icons-material";
 
 import "../styles/Login.css";
 
-const FEATURE_TICKER = [
-  { Icon: Bolt,     text: "Real-time meeting sync" },
-  { Icon: Insights, text: "Smart task prioritization" },
-  { Icon: Shield,   text: "Enterprise-grade encryption" },
-];
-
-export default function LoginDark() {
-  const navigate = useNavigate();
-
-  const [step, setStep] = useState("email"); // "email" | "password"
+export default function LoginPage({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [tickerIndex, setTickerIndex] = useState(0);
-  const passwordRef = useRef(null);
+  const [error, setError] = useState("");
 
-  // rotate the feature ticker on the left panel
-  useEffect(() => {
-    const t = setInterval(() => {
-      setTickerIndex((i) => (i + 1) % FEATURE_TICKER.length);
-    }, 2800);
-    return () => clearInterval(t);
-  }, []);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-  // autofocus the password field the instant we step into it
-  useEffect(() => {
-    if (step === "password") {
-      const t = setTimeout(() => passwordRef.current?.focus(), 350);
-      return () => clearTimeout(t);
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter both email and password.");
+      return;
     }
-  }, [step]);
 
-  const emailValid = /\S+@\S+\.\S+/.test(email);
-
-  const handleContinue = (e) => {
-    e.preventDefault();
-    if (!emailValid) return;
-    setStep("password");
-  };
-
-  const handleBack = () => {
-    setStep("email");
-    setPassword("");
-  };
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (!password) return;
     setLoading(true);
+
+    // Placeholder for real auth call — replace with your API request
     setTimeout(() => {
       setLoading(false);
-      navigate("/dashboard");
-    }, 1400);
+      if (onLogin) onLogin({ email, remember });
+    }, 900);
   };
 
   return (
-    <div className="ld-page">
-      {/* ============ LEFT — animated mesh / brand ============ */}
-      <div className="ld-left">
-        <div className="ld-mesh">
-          <div className="ld-blob ld-blob-1" />
-          <div className="ld-blob ld-blob-2" />
-          <div className="ld-blob ld-blob-3" />
-          <div className="ld-grid-overlay" />
+    <div className="login-page">
+
+      {/* Decorative floating blobs */}
+      <div className="login-blob login-blob-1" />
+      <div className="login-blob login-blob-2" />
+      <div className="login-blob login-blob-3" />
+
+      <div className="login-card">
+
+        {/* Brand */}
+        <div className="login-brand">
+          <div className="login-logo-icon">
+            <WorkspacePremiumRounded />
+          </div>
+          <h1>Executive Hub</h1>
+          <p>Premium Workspace</p>
         </div>
 
-        <div className="ld-left-content">
-          <div className="ld-brand">
-            <div className="ld-brand-mark">EH</div>
-            <span className="ld-brand-name">Executive Hub</span>
-          </div>
+        <h2 className="login-title">Welcome back</h2>
+        <p className="login-subtitle">Sign in to continue to your dashboard</p>
 
-          <div className="ld-hero">
-            <h1 className="ld-hero-title">
-              Command your day<br />with total clarity.
-            </h1>
-            <p className="ld-hero-sub">
-              One workspace for meetings, tasks, notes, and everything
-              that keeps the business moving.
-            </p>
-          </div>
+        <form className="login-form" onSubmit={handleSubmit}>
 
-          {/* rotating feature ticker */}
-          <div className="ld-ticker">
-            <AnimatePresence mode="wait">
-              {FEATURE_TICKER.map((f, i) =>
-                i === tickerIndex ? (
-                  <motion.div
-                    key={f.text}
-                    className="ld-ticker-item"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <f.Icon style={{ fontSize: 18 }} />
-                    <span>{f.text}</span>
-                  </motion.div>
-                ) : null
-              )}
-            </AnimatePresence>
-            <div className="ld-ticker-dots">
-              {FEATURE_TICKER.map((_, i) => (
-                <span key={i} className={`ld-dot ${i === tickerIndex ? "ld-dot-active" : ""}`} />
-              ))}
+          <div className="login-field">
+            <label>Email Address</label>
+            <div className="login-input-wrap">
+              <Email className="login-input-icon" style={{ fontSize: 18 }} />
+              <input
+                type="email"
+                placeholder="you@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoFocus
+              />
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* ============ RIGHT — auth card ============ */}
-      <div className="ld-right">
-        <div className="ld-card">
-          {/* mobile-only brand mark */}
-          <div className="ld-card-brand-mobile">
-            <div className="ld-brand-mark">EH</div>
+          <div className="login-field">
+            <label>Password</label>
+            <div className="login-input-wrap">
+              <Lock className="login-input-icon" style={{ fontSize: 18 }} />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className="login-eye-btn"
+                onClick={() => setShowPassword((v) => !v)}
+                tabIndex={-1}
+              >
+                {showPassword ? <VisibilityOff style={{ fontSize: 18 }} /> : <Visibility style={{ fontSize: 18 }} />}
+              </button>
+            </div>
           </div>
 
-          <AnimatePresence mode="wait">
-            {step === "email" ? (
-              <motion.div
-                key="email-step"
-                initial={{ opacity: 0, x: 24 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -24 }}
-                transition={{ duration: 0.3 }}
-              >
-                <p className="ld-step-label">Step 1 of 2</p>
-                <h2 className="ld-card-title">Welcome back</h2>
-                <p className="ld-card-sub">Enter your work email to continue.</p>
+          {error && <div className="login-error">{error}</div>}
 
-                <form onSubmit={handleContinue} className="ld-form">
-                  <div className="ld-field">
-                    <label className="ld-label">Email address</label>
-                    <input
-                      type="email"
-                      autoFocus
-                      placeholder="you@company.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="ld-input"
-                    />
-                  </div>
+          <div className="login-row-between">
+            <label className="login-checkbox">
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+              />
+              <span>Remember me</span>
+            </label>
 
-                  <button
-                    type="submit"
-                    disabled={!emailValid}
-                    className="ld-btn-primary"
-                  >
-                    Continue <ArrowForward style={{ fontSize: 18 }} />
-                  </button>
-                </form>
+            <a href="#" className="login-forgot">Forgot password?</a>
+          </div>
 
-                <div className="ld-divider"><span>or</span></div>
+          <button type="submit" className="login-submit-btn" disabled={loading}>
+            {loading ? <span className="login-spinner" /> : "Sign In"}
+          </button>
 
-                <button className="ld-btn-sso">
-                  <span className="ld-sso-dot" />
-                  Continue with Single Sign-On
-                </button>
+        </form>
 
-                <p className="ld-footer-text">
-                  New to Executive Hub? <a href="#">Request access</a>
-                </p>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="password-step"
-                initial={{ opacity: 0, x: 24 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -24 }}
-                transition={{ duration: 0.3 }}
-              >
-                <button className="ld-back-btn" onClick={handleBack} type="button">
-                  <ArrowBack style={{ fontSize: 16 }} /> Back
-                </button>
-
-                <p className="ld-step-label">Step 2 of 2</p>
-                <h2 className="ld-card-title">Enter your password</h2>
-
-                <div className="ld-identity-chip">
-                  <CheckCircle style={{ fontSize: 16, color: "#34D399" }} />
-                  <span>{email}</span>
-                </div>
-
-                <form onSubmit={handleLogin} className="ld-form">
-                  <div className="ld-field">
-                    <label className="ld-label">Password</label>
-                    <div className="ld-password-wrap">
-                      <Lock className="ld-password-icon" style={{ fontSize: 18 }} />
-                      <input
-                        ref={passwordRef}
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="ld-input ld-input-password"
-                      />
-                      <button
-                        type="button"
-                        className="ld-eye-btn"
-                        onClick={() => setShowPassword((s) => !s)}
-                      >
-                        {showPassword ? <VisibilityOff style={{ fontSize: 18 }} /> : <Visibility style={{ fontSize: 18 }} />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="ld-row-between">
-                    <label className="ld-checkbox-label">
-                      <input type="checkbox" className="ld-checkbox" />
-                      Stay signed in
-                    </label>
-                    <a href="#" className="ld-link-small">Forgot password?</a>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={!password || loading}
-                    className="ld-btn-primary"
-                  >
-                    {loading ? (
-                      <span className="ld-spinner" />
-                    ) : (
-                      <>Sign in <ArrowForward style={{ fontSize: 18 }} /></>
-                    )}
-                  </button>
-                </form>
-              </motion.div>
-            )}
-          </AnimatePresence>
+        <div className="login-divider">
+          <span>or continue with</span>
         </div>
 
-        <p className="ld-legal">© 2026 Executive Hub. All rights reserved.</p>
+        <div className="login-social-row">
+          <button type="button" className="login-social-btn">
+            <GoogleIcon /> Google
+          </button>
+          <button type="button" className="login-social-btn">
+            <MicrosoftIcon /> Microsoft
+          </button>
+        </div>
+
+        <p className="login-footer-text">
+          Don't have an account? <a href="#">Contact your administrator</a>
+        </p>
+
       </div>
     </div>
+  );
+}
+
+/* Small inline brand icons so no extra icon-library dependency is needed */
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 48 48">
+      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.5 29.3 35.5 24 35.5c-6.9 0-12.5-5.6-12.5-12.5S17.1 10.5 24 10.5c3.2 0 6.1 1.2 8.3 3.2l5.7-5.7C34.6 4.9 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.2-.1-2.4-.4-3.5z"/>
+      <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.9 18.9 13 24 13c3.2 0 6.1 1.2 8.3 3.2l5.7-5.7C34.6 6.9 29.6 5 24 5c-7.6 0-14.2 4.3-17.7 10.7z"/>
+      <path fill="#4CAF50" d="M24 43c5.5 0 10.4-1.9 14.1-5l-6.5-5.5c-2 1.5-4.6 2.5-7.6 2.5-5.3 0-9.7-3.4-11.3-8.1l-6.6 5C9.7 38.6 16.3 43 24 43z"/>
+      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.5 5.5C40.9 36.6 44 30.9 44 24c0-1.2-.1-2.4-.4-3.5z"/>
+    </svg>
+  );
+}
+
+function MicrosoftIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 23 23">
+      <rect x="1" y="1" width="10" height="10" fill="#F25022"/>
+      <rect x="12" y="1" width="10" height="10" fill="#7FBA00"/>
+      <rect x="1" y="12" width="10" height="10" fill="#00A4EF"/>
+      <rect x="12" y="12" width="10" height="10" fill="#FFB900"/>
+    </svg>
   );
 }
