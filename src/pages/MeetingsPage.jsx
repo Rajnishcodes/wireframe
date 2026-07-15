@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Groups,
   CalendarMonth,
@@ -11,6 +11,9 @@ import {
   Close,
   CheckCircle,
   Link as LinkIcon,
+  MoreVert,
+  Edit,
+  Delete,
 } from "@mui/icons-material";
 
 import {
@@ -25,55 +28,104 @@ import {
 
 import "../styles/Dashboard.css";
 import "../styles/MeetingsPage.css";
+import { useAuth } from "../context/AuthContext";
 
-/* =====================================================
-   Platform definitions
-===================================================== */
+const API_BASE_URL = "http://localhost:5000/api";
 
 const PLATFORMS = [
-  { id: "zoom",     name: "Zoom",             short: "Z",  color: "#2D8CFF", urlPrefix: "https://zoom.us/j/" },
-  { id: "meet",     name: "Google Meet",      short: "G",  color: "#00897B", urlPrefix: "https://meet.google.com/" },
-  { id: "teams",    name: "Microsoft Teams",  short: "T",  color: "#5059C9", urlPrefix: "https://teams.microsoft.com/l/meetup-join/" },
-  { id: "custom",   name: "Custom Link",      short: "🔗", color: "#7C3AED", urlPrefix: "" },
+  { id: "zoom",   name: "Zoom",             short: "Z",  color: "#2D8CFF", urlPrefix: "https://zoom.us/j/" },
+  { id: "meet",   name: "Google Meet",      short: "G",  color: "#00897B", urlPrefix: "https://meet.google.com/" },
+  { id: "teams",  name: "Microsoft Teams",  short: "T",  color: "#5059C9", urlPrefix: "https://teams.microsoft.com/l/meetup-join/" },
+  { id: "custom", name: "Custom Link",      short: "🔗", color: "#7C3AED", urlPrefix: "" },
 ];
 
 const getPlatform = (id) => PLATFORMS.find((p) => p.id === id) || PLATFORMS[3];
 
-const INITIAL_MEETINGS = [
-  { id: 1, title: "Project Review",         time: "Today · 10:30 AM",    duration: "60 min", location: "Conference Room A", people: 7,  status: "Upcoming",  tone: "info",    platform: "meet",  joinLink: "https://meet.google.com/abc-defg-hij" },
-  { id: 2, title: "Client Call — Acme Co.", time: "Today · 03:00 PM",    duration: "45 min", location: "Zoom",              people: 4,  status: "Upcoming",  tone: "info",    platform: "zoom",  joinLink: "https://zoom.us/j/1234567890" },
-  { id: 3, title: "Team Meeting",           time: "Today · 05:30 PM",    duration: "30 min", location: "Conference Room B", people: 12, status: "Upcoming",  tone: "info",    platform: "teams", joinLink: "https://teams.microsoft.com/l/meetup-join/sample" },
-  { id: 4, title: "Investor Sync",          time: "Tomorrow · 11:00 AM", duration: "60 min", location: "Zoom",              people: 5,  status: "Scheduled", tone: "warning", platform: "zoom",  joinLink: "https://zoom.us/j/9876543210" },
-  { id: 5, title: "Morning Brief",          time: "Today · 09:00 AM",    duration: "15 min", location: "Team",              people: 8,  status: "Completed", tone: "success", platform: "meet",  joinLink: "https://meet.google.com/xyz-uvwx-rst" },
-];
-
-const toneStyles = {
-  success: "badge-success",
-  info: "badge-info",
-  warning: "badge-warning",
+const detectPlatformFromLink = (link) => {
+  if (!link) return null;
+  const url = link.toLowerCase();
+  if (url.includes("zoom.us")) return "zoom";
+  if (url.includes("meet.google.com")) return "meet";
+  if (url.includes("teams.microsoft.com") || url.includes("teams.live.com")) return "teams";
+  return "custom";
 };
 
+const toneStyles = { success: "badge-success", info: "badge-info", warning: "badge-warning" };
+const statusToTone = { Upcoming: "info", Scheduled: "warning", Completed: "success" };
 const FILTERS = ["All", "Upcoming", "Scheduled", "Completed"];
 
 const emptyForm = {
   title: "",
-  date: "Today",
-  time: "",
-  duration: "30 min",
+  scheduledAt: "",
+  durationMinutes: 30,
   location: "",
   people: 1,
   status: "Upcoming",
-  platform: "zoom",
   joinLink: "",
 };
 
+// Formats a real Date into "Today · 5:42 PM", "Tomorrow · ...", or a short date
+const formatScheduledLabel = (scheduledAt) => {
+  const d = new Date(scheduledAt);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dayOnly = new Date(d);
+  dayOnly.setHours(0, 0, 0, 0);
+
+  const diffDays = Math.round((dayOnly - today) / (1000 * 60 * 60 * 24));
+  const timeLabel = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+
+  let dayLabel;
+  if (diffDays === 0) dayLabel = "Today";
+  else if (diffDays === 1) dayLabel = "Tomorrow";
+  else if (diffDays === -1) dayLabel = "Yesterday";
+  else dayLabel = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+  return `${dayLabel} · ${timeLabel}`;
+};
+
+// Converts a Date/ISO string into the "yyyy-MM-ddTHH:mm" format
+// required by <input type="datetime-local">
+const toDatetimeLocalValue = (isoString) => {
+  if (!isoString) return "";
+  const d = new Date(isoString);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
 export default function MeetingsPage() {
-  const [meetings, setMeetings] = useState(INITIAL_MEETINGS);
+  const { user } = useAuth();
+  const canManageMeetings = user?.role === "superadmin" || user?.role === "admin";
+
+  const [meetings, setMeetings] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
-  const [joined, setJoined] = useState(null); // id of meeting currently "in"
+  const [joined, setJoined] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null); // null = creating new
+  const [menuOpenId, setMenuOpenId] = useState(null);
+
+  const fetchMeetings = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/meetings`, { credentials: "include" });
+      const data = await res.json();
+      setMeetings(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to load meetings:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMeetings();
+    // Re-fetch periodically so a meeting that just ended flips to
+    // "Completed" without requiring a manual page refresh
+    const interval = setInterval(fetchMeetings, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const filtered = useMemo(() => {
     return meetings.filter((m) => {
@@ -86,43 +138,102 @@ export default function MeetingsPage() {
   const upcomingCount = meetings.filter((m) => m.status === "Upcoming").length;
   const completedToday = meetings.filter((m) => m.status === "Completed").length;
 
-  const statusToTone = { Upcoming: "info", Scheduled: "warning", Completed: "success" };
-
   const openScheduleDialog = () => {
     setForm(emptyForm);
+    setEditingId(null);
     setDialogOpen(true);
   };
 
-  const handleCreateMeeting = () => {
-    if (!form.title.trim()) return;
+  const openEditDialog = (m) => {
+    setForm({
+      title: m.title,
+      scheduledAt: toDatetimeLocalValue(m.scheduledAt),
+      durationMinutes: m.durationMinutes,
+      location: m.location,
+      people: m.people,
+      status: m.status,
+      joinLink: m.joinLink === "#" ? "" : m.joinLink,
+    });
+    setEditingId(m._id);
+    setMenuOpenId(null);
+    setDialogOpen(true);
+  };
 
-    const newMeeting = {
-      id: Date.now(),
+  const handleSaveMeeting = async () => {
+    if (!form.title.trim() || !form.scheduledAt) return;
+
+    const payload = {
       title: form.title,
-      time: `${form.date} · ${form.time || "TBD"}`,
-      duration: form.duration,
-      location: form.location || getPlatform(form.platform).name,
+      scheduledAt: new Date(form.scheduledAt).toISOString(),
+      durationMinutes: Number(form.durationMinutes) || 30,
+      location: form.location || getPlatform(detectPlatformFromLink(form.joinLink) || "custom").name,
       people: Number(form.people) || 1,
       status: form.status,
-      tone: statusToTone[form.status],
-      platform: form.platform,
       joinLink: form.joinLink || "#",
     };
 
-    setMeetings((prev) => [newMeeting, ...prev]);
-    setDialogOpen(false);
+    try {
+      const url = editingId ? `${API_BASE_URL}/meetings/${editingId}` : `${API_BASE_URL}/meetings`;
+      const method = editingId ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Failed to save meeting");
+      }
+
+      const saved = await res.json();
+
+      setMeetings((prev) =>
+        editingId ? prev.map((m) => (m._id === saved._id ? saved : m)) : [saved, ...prev]
+      );
+
+      setDialogOpen(false);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  const handleDeleteMeeting = async (id) => {
+    setMenuOpenId(null);
+    const prevMeetings = meetings;
+    setMeetings((prev) => prev.filter((m) => m._id !== id));
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/meetings/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to delete meeting");
+    } catch (err) {
+      console.error(err.message);
+      setMeetings(prevMeetings);
+    }
   };
 
   const handleJoin = (m) => {
-    if (joined === m.id) {
+    if (joined === m._id) {
       setJoined(null);
       return;
     }
-    setJoined(m.id);
+    setJoined(m._id);
     if (m.joinLink && m.joinLink !== "#") {
       window.open(m.joinLink, "_blank", "noopener,noreferrer");
     }
   };
+
+  const handleJoinLinkChange = (e) => {
+    const link = e.target.value;
+    setForm((f) => ({ ...f, joinLink: link }));
+  };
+
+  const detectedPlatform = getPlatform(detectPlatformFromLink(form.joinLink));
 
   return (
     <div className="lavender-page">
@@ -135,16 +246,19 @@ export default function MeetingsPage() {
           <div>
             <h1 className="greeting-title" style={{ fontSize: "1.5rem" }}>Meetings</h1>
             <p className="muted text-sm mt-1">
-              {upcomingCount} meetings scheduled · {completedToday} completed today
+              {upcomingCount} meetings scheduled · {completedToday} completed
             </p>
           </div>
         </div>
-        <button className="btn-gradient meet-header-btn" onClick={openScheduleDialog}>
-          <Add className="icon-sm" /> Schedule Meeting
-        </button>
+
+        {canManageMeetings && (
+          <button className="btn-gradient meet-header-btn" onClick={openScheduleDialog}>
+            <Add className="icon-sm" /> Schedule Meeting
+          </button>
+        )}
       </div>
 
-      {/* Toolbar: search + status filter pills */}
+      {/* Toolbar */}
       <div className="meet-toolbar mb-6">
         <div className="meet-search">
           <Search className="icon-muted icon-sm" />
@@ -176,7 +290,9 @@ export default function MeetingsPage() {
 
       {/* Meeting list */}
       <div className="meet-list">
-        {filtered.length === 0 && (
+        {loading && <div className="glass-card p-6 meet-empty"><p className="muted">Loading meetings...</p></div>}
+
+        {!loading && filtered.length === 0 && (
           <div className="glass-card p-6 meet-empty">
             <Search className="icon-muted" style={{ fontSize: 32 }} />
             <p className="muted mt-2">No meetings match your search.</p>
@@ -184,12 +300,13 @@ export default function MeetingsPage() {
         )}
 
         {filtered.map((m) => {
-          const isJoined = joined === m.id;
+          const isJoined = joined === m._id;
           const canJoin = m.status !== "Completed";
           const platform = getPlatform(m.platform);
+          const isMenuOpen = menuOpenId === m._id;
 
           return (
-            <div key={m.id} className="glass-card meet-card">
+            <div key={m._id} className="glass-card meet-card">
               <div className="meet-icon-box">
                 <CalendarMonth className="icon-violet" style={{ fontSize: 26 }} />
               </div>
@@ -208,7 +325,7 @@ export default function MeetingsPage() {
 
                 <div className="meet-meta-row">
                   <span className="meet-meta-item">
-                    <Schedule style={{ fontSize: 16 }} /> {m.time} · {m.duration}
+                    <Schedule style={{ fontSize: 16 }} /> {formatScheduledLabel(m.scheduledAt)} · {m.durationMinutes} min
                   </span>
                   <span className="meet-meta-item">
                     <LocationOn style={{ fontSize: 16 }} /> {m.location}
@@ -219,7 +336,7 @@ export default function MeetingsPage() {
                 </div>
               </div>
 
-              <span className={`badge ${toneStyles[m.tone]}`}>{m.status}</span>
+              <span className={`badge ${toneStyles[statusToTone[m.status]]}`}>{m.status}</span>
 
               {canJoin ? (
                 <button
@@ -241,110 +358,117 @@ export default function MeetingsPage() {
                   <CheckCircle style={{ fontSize: 18 }} /> Done
                 </button>
               )}
+
+              {/* Edit/Delete — only visible to Admin & Super Admin */}
+              {canManageMeetings && (
+                <div className="meet-menu-wrap">
+                  <button className="note-icon-btn" onClick={() => setMenuOpenId(isMenuOpen ? null : m._id)}>
+                    <MoreVert style={{ fontSize: 20 }} />
+                  </button>
+                  {isMenuOpen && (
+                    <div className="meet-item-menu">
+                      <button onClick={() => openEditDialog(m)}>
+                        <Edit style={{ fontSize: 16 }} /> Edit
+                      </button>
+                      <button className="meet-item-menu-danger" onClick={() => handleDeleteMeeting(m._id)}>
+                        <Delete style={{ fontSize: 16 }} /> Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}
       </div>
 
-      {/* Schedule Meeting Dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle>Schedule Meeting</DialogTitle>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
-          <TextField
-            label="Meeting title"
-            size="small"
-            value={form.title}
-            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-          />
-
-          <div style={{ display: "flex", gap: 12 }}>
+      {/* Schedule / Edit Meeting Dialog */}
+      {canManageMeetings && (
+        <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="xs">
+          <DialogTitle>{editingId ? "Edit Meeting" : "Schedule Meeting"}</DialogTitle>
+          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
             <TextField
-              label="Date"
+              label="Meeting title"
               size="small"
-              placeholder="Today / Tomorrow / Jul 10"
-              value={form.date}
-              onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
-              fullWidth
+              value={form.title}
+              onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
             />
+
             <TextField
-              label="Time"
+              label="Date & Time"
+              type="datetime-local"
               size="small"
-              placeholder="e.g. 02:00 PM"
-              value={form.time}
-              onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))}
-              fullWidth
+              value={form.scheduledAt}
+              onChange={(e) => setForm((f) => ({ ...f, scheduledAt: e.target.value }))}
+              InputLabelProps={{ shrink: true }}
             />
-          </div>
 
-          <div style={{ display: "flex", gap: 12 }}>
+            <div style={{ display: "flex", gap: 12 }}>
+              <TextField
+                label="Duration (minutes)"
+                type="number"
+                size="small"
+                value={form.durationMinutes}
+                inputProps={{ min: 1 }}
+                onChange={(e) => setForm((f) => ({ ...f, durationMinutes: e.target.value }))}
+                fullWidth
+              />
+              <TextField
+                label="People"
+                type="number"
+                size="small"
+                value={form.people}
+                inputProps={{ min: 1 }}
+                onChange={(e) => setForm((f) => ({ ...f, people: e.target.value }))}
+                fullWidth
+              />
+            </div>
+
             <TextField
-              label="Duration"
+              label="Location / Room (optional)"
               size="small"
-              value={form.duration}
-              onChange={(e) => setForm((f) => ({ ...f, duration: e.target.value }))}
-              fullWidth
+              placeholder="Leave blank to use platform name"
+              value={form.location}
+              onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
             />
+
             <TextField
-              label="People"
-              type="number"
+              select
+              label="Status"
               size="small"
-              value={form.people}
-              inputProps={{ min: 1 }}
-              onChange={(e) => setForm((f) => ({ ...f, people: e.target.value }))}
-              fullWidth
+              value={form.status}
+              onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}
+            >
+              {["Upcoming", "Scheduled", "Completed"].map((s) => (
+                <MenuItem key={s} value={s}>{s}</MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              label="Join link / Meeting ID"
+              size="small"
+              placeholder="https://..."
+              value={form.joinLink}
+              onChange={handleJoinLinkChange}
+              InputProps={{
+                startAdornment: <LinkIcon style={{ fontSize: 18, marginRight: 6, color: "#9CA3AF" }} />,
+              }}
             />
-          </div>
 
-          <TextField
-            label="Location / Room (optional)"
-            size="small"
-            placeholder="Leave blank to use platform name"
-            value={form.location}
-            onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
-          />
-
-          <TextField
-            select
-            label="Status"
-            size="small"
-            value={form.status}
-            onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}
-          >
-            {["Upcoming", "Scheduled", "Completed"].map((s) => (
-              <MenuItem key={s} value={s}>{s}</MenuItem>
-            ))}
-          </TextField>
-
-          <TextField
-            select
-            label="Meeting platform"
-            size="small"
-            value={form.platform}
-            onChange={(e) => setForm((f) => ({ ...f, platform: e.target.value }))}
-          >
-            {PLATFORMS.map((p) => (
-              <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>
-            ))}
-          </TextField>
-
-          <TextField
-            label="Join link / Meeting ID"
-            size="small"
-            placeholder={getPlatform(form.platform).urlPrefix || "https://..."}
-            value={form.joinLink}
-            onChange={(e) => setForm((f) => ({ ...f, joinLink: e.target.value }))}
-            InputProps={{
-              startAdornment: <LinkIcon style={{ fontSize: 18, marginRight: 6, color: "#9CA3AF" }} />,
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" className="new-event-btn" onClick={handleCreateMeeting}>
-            Schedule
-          </Button>
-        </DialogActions>
-      </Dialog>
+            {form.joinLink.trim() && (
+              <div style={{ fontSize: "0.75rem", color: "#7C3AED", fontWeight: 600, marginTop: -8 }}>
+                Detected platform: {detectedPlatform.name}
+              </div>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button variant="contained" className="new-event-btn" onClick={handleSaveMeeting}>
+              {editingId ? "Save Changes" : "Schedule"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </div>
   );
 }

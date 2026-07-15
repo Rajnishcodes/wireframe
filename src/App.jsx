@@ -16,31 +16,125 @@ import SettingsPage from "./pages/SettingsPage";
 import MyProfile from "./pages/MyProfile";
 import AccountSettings from "./pages/AccountSettings";
 import Onedrive from "./pages/Onedrive";
+import RegisterPage from "./pages/RegisterPage";
+import ForgotPasswordPage from "./pages/ForgotPassword";
+import ResetPasswordPage from "./pages/ResetPassword";
+import VerifyEmailPage from "./pages/VerifyEmail";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import RoleRoute from "./components/RoleRoute";
+import { AuthProvider } from "./context/AuthContext";
+
+// Pages an Admin should NOT be able to open (Super Admin + regular User only)
+const RESTRICTED_FROM_ADMIN = ["superadmin", "user"];
+
+// Only Super Admin can create new accounts
+const SUPERADMIN_ONLY = ["superadmin"];
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public */}
-        <Route path="/" element={<Login />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public */}
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/register"
+            element={
+              <ProtectedRoute>
+                <RoleRoute allowedRoles={SUPERADMIN_ONLY}>
+                  <RegisterPage />
+                </RoleRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
 
-        {/* Protected — share Header + Sidebar layout */}
-        <Route element={<DashboardLayout />}>
-          <Route path="/dashboard"  element={<Dashboard />} />
-          <Route path="/calendar"   element={<Calendar />} />
-          <Route path="/contacts"   element={<Contacts />} />
-          <Route path="/documents"  element={<Documents />} />
-          <Route path="/meetings"   element={<MeetingsPage />} />
-          <Route path="/notes"      element={<Notes />} />
-          <Route path="/reminders"  element={<Reminders />} />
-          <Route path="/tasks"      element={<Task />} />
-          <Route path="/settings"   element={<SettingsPage />} />
-          <Route path="/profile"   element={<MyProfile />} />
-          <Route path="/accountsettings"   element={<AccountSettings />} />
-          <Route path="/onedrive"   element={<Onedrive />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+          {/* Protected — share Header + Sidebar layout */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            {/* Allowed for ALL logged-in roles (Super Admin, Admin, User) */}
+            <Route path="/meetings" element={<MeetingsPage />} />
+            <Route path="/tasks" element={<Task />} />
+            <Route path="/notes" element={<Notes />} />
+            <Route path="/onedrive" element={<Onedrive />} />
+
+            {/* Restricted from Admin */}
+            <Route
+              path="/dashboard"
+              element={
+                <RoleRoute allowedRoles={RESTRICTED_FROM_ADMIN}>
+                  <Dashboard />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/calendar"
+              element={
+                <RoleRoute allowedRoles={RESTRICTED_FROM_ADMIN}>
+                  <Calendar />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/contacts"
+              element={
+                <RoleRoute allowedRoles={RESTRICTED_FROM_ADMIN}>
+                  <Contacts />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/documents"
+              element={
+                <RoleRoute allowedRoles={RESTRICTED_FROM_ADMIN}>
+                  <Documents />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/reminders"
+              element={
+                <RoleRoute allowedRoles={RESTRICTED_FROM_ADMIN}>
+                  <Reminders />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <RoleRoute allowedRoles={RESTRICTED_FROM_ADMIN}>
+                  <SettingsPage />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <RoleRoute allowedRoles={RESTRICTED_FROM_ADMIN}>
+                  <MyProfile />
+                </RoleRoute>
+              }
+            />
+            <Route
+              path="/accountsettings"
+              element={
+                <RoleRoute allowedRoles={RESTRICTED_FROM_ADMIN}>
+                  <AccountSettings />
+                </RoleRoute>
+              }
+            />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

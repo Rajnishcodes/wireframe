@@ -19,8 +19,18 @@ import {
   MenuItem,
 } from "@mui/material";
 
+import { useAuth } from "../context/AuthContext";
+
+// Human-friendly labels for each stored role value
+const ROLE_LABELS = {
+  superadmin: "Super Admin",
+  admin: "Administrator",
+  user: "Member",
+};
+
 export default function Header() {
   const navigate = useNavigate();
+  const { user, setUser } = useAuth();
 
   const [profileAnchor, setProfileAnchor] = useState(null);
   const [notificationAnchor, setNotificationAnchor] = useState(null);
@@ -33,9 +43,11 @@ export default function Header() {
     year: "numeric",
   });
 
-  // Full user name lives here — swap this out for your actual auth/user data later
-  const userFullName = "John Doe";
-  const userFirstName = userFullName.split(" ")[0];
+  // Real logged-in user data, pulled from AuthContext instead of hardcoded values
+  const userFullName = user?.name || "";
+  const userFirstName = userFullName.split(" ")[0] || "";
+  const userRoleLabel = ROLE_LABELS[user?.role] || "Member";
+  const userAvatar = user?.avatar || "https://i.pravatar.cc/150?img=12";
 
   const closeProfileMenu = () => setProfileAnchor(null);
   const closeSettingsMenu = () => setSettingsAnchor(null);
@@ -47,13 +59,23 @@ export default function Header() {
 
   const goToAccountSettings = () => {
     closeProfileMenu();
-    navigate("/account-settings");
+    navigate("/accountsettings");
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     closeProfileMenu();
-    // Placeholder — wire this to your real auth/logout logic later
-    navigate("/login");
+
+    try {
+      await fetch("http://localhost:5000/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Logout request failed:", err.message);
+    } finally {
+      setUser(null);
+      navigate("/login");
+    }
   };
 
   const goToSettingsPage = () => {
@@ -131,13 +153,13 @@ export default function Header() {
           onClick={(e) => setProfileAnchor(e.currentTarget)}
         >
           <Avatar
-            src="https://i.pravatar.cc/150?img=12"
+            src={userAvatar}
             sx={{ width: 42, height: 42 }}
           />
 
           <div className="profile-info">
-            <h5>John Doe</h5>
-            <span>Administrator</span>
+            <h5>{userFullName}</h5>
+            <span>{userRoleLabel}</span>
           </div>
 
           <KeyboardArrowDown />
