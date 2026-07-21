@@ -1,0 +1,156 @@
+.whiteboard-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 27, 46, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+.whiteboard-modal {
+  background: #fff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 800px;
+  height: 85vh;
+  max-height: 700px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
+}
+
+.whiteboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #E9E5F5;
+  flex-shrink: 0;
+}
+
+.whiteboard-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1E1B2E;
+}
+
+.whiteboard-icon-btn {
+  border: none;
+  background: none;
+  color: #6B6580;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.whiteboard-icon-btn:hover { background: #F3F0FB; }
+.whiteboard-icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.whiteboard-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #E9E5F5;
+  flex-shrink: 0;
+}
+
+.whiteboard-tool-group,
+.whiteboard-color-group,
+.whiteboard-size-group,
+.whiteboard-action-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.whiteboard-tool-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid #E9E5F5;
+  background: #fff;
+  color: #6B6580;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.whiteboard-tool-btn:hover { background: #F3F0FB; }
+.whiteboard-tool-active {
+  background: linear-gradient(135deg, #A78BFA, #7C3AED);
+  color: #fff;
+  border-color: transparent;
+}
+
+.whiteboard-color-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.whiteboard-color-dot:hover { transform: scale(1.1); }
+.whiteboard-color-active { border-color: #1E1B2E; }
+
+.whiteboard-size-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid #E9E5F5;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.whiteboard-size-btn:hover { background: #F3F0FB; }
+.whiteboard-size-active { border-color: #A78BFA; background: #F4F0FF; }
+.whiteboard-size-dot {
+  border-radius: 50%;
+  background: #1E1B2E;
+}
+
+.whiteboard-canvas-wrap {
+  flex: 1;
+  overflow: hidden;
+  background: #FAFAFA;
+  touch-action: none; /* prevents the page from scrolling while drawing on touch devices */
+}
+
+.whiteboard-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.whiteboard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid #E9E5F5;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .whiteboard-modal { height: 90vh; border-radius: 16px; }
+  .whiteboard-toolbar { gap: 10px; padding: 10px 14px; }
+}

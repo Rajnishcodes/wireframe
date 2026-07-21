@@ -183,6 +183,99 @@
 }
 .rem-toast-undo:hover { background: rgba(255,255,255,0.25); }
 
+/* ============ Header actions group ============ */
+.rem-header-actions {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 10px;
+}
+
+/* ============ Preferences panel ============ */
+.rem-prefs-panel { }
+
+.rem-prefs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 560px) {
+  .rem-prefs-grid { grid-template-columns: 1fr; }
+}
+
+.rem-pref-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.rem-pref-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rem-pref-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rem-pref-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.rem-switch {
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  border: none;
+  background: #E2DDF5;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+.rem-switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease;
+}
+.rem-switch-on { background: linear-gradient(135deg, #A78BFA, #7C3AED); }
+.rem-switch-on .rem-switch-thumb { transform: translateX(18px); }
+
+/* ============ Title row + category badge ============ */
+.rem-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rem-category-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
 /* ============ Responsive ============ */
 @media (max-width: 560px) {
   .rem-item { flex-wrap: wrap; }

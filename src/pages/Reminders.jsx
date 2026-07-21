@@ -1,67 +1,114 @@
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   NotificationsActive,
   Call,
   Groups,
   TaskAlt,
-  ReceiptLong,
-  Draw,
+  Event,
+  NoteAlt,
   Schedule,
   Check,
-  MoreHoriz,
+  MoreVert,
   Add,
   Close,
   Snooze,
   Edit,
   Delete,
   Undo,
+  Tune,
 } from "@mui/icons-material";
 
 import "../styles/Dashboard.css";
 import "../styles/Reminders.css";
 
-const ICON_MAP = {
-  call: Call,
-  groups: Groups,
-  task_alt: TaskAlt,
-  receipt_long: ReceiptLong,
-  draw: Draw,
-};
+const API_BASE_URL = "http://localhost:5000/api";
 
-const TONE_STYLES = {
-  rose:    "tone-rose",
-  amber:   "tone-amber",
-  emerald: "tone-emerald",
+// Visuals per category — icon, color, label. This drives the badge
+// shown on every reminder card, and the toggle panel labels.
+const CATEGORY_META = {
+  notes:    { label: "Notes",    color: "#7C3AED", Icon: NoteAlt },
+  meetings: { label: "Meetings", color: "#0284C7", Icon: Event },
+  tasks:    { label: "Tasks",    color: "#059669", Icon: TaskAlt },
+  general:  { label: "General",  color: "#D97706", Icon: Call },
 };
 
 const PRIORITY_TONE = {
-  High:   "rose",
-  Medium: "amber",
-  Low:    "emerald",
+  High: "tone-rose",
+  Medium: "tone-amber",
+  Low: "tone-emerald",
 };
 
-const INITIAL_REMINDERS = [
-  { id: 1, title: "Call Investor",              time: "Today · 04:00 PM",    priority: "High",   icon: "call"         },
-  { id: 2, title: "Board Meeting",               time: "Tomorrow · 11:00 AM", priority: "High",   icon: "groups"       },
-  { id: 3, title: "Approve marketing budget",   time: "Fri · 10:00 AM",      priority: "Medium", icon: "task_alt"     },
-  { id: 4, title: "Submit expense report",       time: "Sat · 12:00 PM",      priority: "Low",    icon: "receipt_long" },
-  { id: 5, title: "Sign partnership MOU",        time: "Mon · 09:00 AM",      priority: "Medium", icon: "draw"         },
-];
+const emptyForm = { title: "", time: "", priority: "Medium" };
 
-const PRIORITY_OPTIONS = ["High", "Medium", "Low"];
+// Converts an ISO/Date value into the "yyyy-MM-ddTHH:mm" format
+// required by <input type="datetime-local">
+const toDatetimeLocalValue = (isoString) => {
+  if (!isoString) return "";
+  const d = new Date(isoString);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
+const formatReminderTime = (time) => {
+  const d = new Date(time);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dayOnly = new Date(d);
+  dayOnly.setHours(0, 0, 0, 0);
+
+  const diffDays = Math.round((dayOnly - today) / (1000 * 60 * 60 * 24));
+  const timeLabel = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+
+  let dayLabel;
+  if (diffDays === 0) dayLabel = "Today";
+  else if (diffDays === 1) dayLabel = "Tomorrow";
+  else if (diffDays === -1) dayLabel = "Yesterday";
+  else dayLabel = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+  return `${dayLabel} · ${timeLabel}`;
+};
 
 export default function RemindersPage() {
-  const [reminders, setReminders] = useState(INITIAL_REMINDERS);
-  const [completed, setCompleted] = useState([]); // recently completed, for undo
+  const [reminders, setReminders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [preferences, setPreferences] = useState({ notes: true, meetings: true, tasks: true, general: true });
+  const [prefsOpen, setPrefsOpen] = useState(false);
   const [openMenuId, setOpenMenuId] = useState(null);
   const [editing, setEditing] = useState(null); // reminder being edited, or "new"
   const [draftTitle, setDraftTitle] = useState("");
   const [draftTime, setDraftTime] = useState("");
   const [draftPriority, setDraftPriority] = useState("Medium");
-  const [toast, setToast] = useState(null); // { text }
+  const [toast, setToast] = useState(null);
   const menuRef = useRef(null);
 
-  // close the kebab menu on outside click
+  const fetchReminders = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/reminders`, { credentials: "include" });
+      const data = await res.json();
+      setReminders(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to load reminders:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPreferences = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/me/preferences`, { credentials: "include" });
+      const data = await res.json();
+      if (data && typeof data === "object") setPreferences(data);
+    } catch (err) {
+      console.error("Failed to load preferences:", err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchReminders();
+    fetchPreferences();
+  }, []);
+
+  // Close the kebab menu on outside click
   useEffect(() => {
     function handleClick(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -72,44 +119,133 @@ export default function RemindersPage() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  // auto-dismiss toast
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(null), 4000);
     return () => clearTimeout(t);
   }, [toast]);
 
-  const dueTodayCount = reminders.filter((r) => r.time.startsWith("Today")).length;
-  const upcomingCount = reminders.length - dueTodayCount;
+  const showToast = (text, extra = {}) => setToast({ text, ...extra });
 
-  const complete = (id) => {
-    const r = reminders.find((x) => x.id === id);
+  // Only reminders whose category the user currently has enabled, and
+  // that aren't marked completed, show up in the active list
+  const visibleReminders = useMemo(() => {
+    return reminders
+      .filter((r) => !r.completed)
+      .filter((r) => preferences[r.category] !== false)
+      .sort((a, b) => new Date(a.time) - new Date(b.time));
+  }, [reminders, preferences]);
+
+  const dueTodayCount = visibleReminders.filter((r) => {
+    const d = new Date(r.time);
+    const today = new Date();
+    return d.toDateString() === today.toDateString();
+  }).length;
+  const upcomingCount = visibleReminders.length - dueTodayCount;
+
+  const togglePreference = async (category) => {
+    const newValue = !preferences[category];
+    const prevPrefs = preferences;
+
+    // Optimistic update
+    setPreferences((prev) => ({ ...prev, [category]: newValue }));
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/me/preferences`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [category]: newValue }),
+      });
+      if (!res.ok) throw new Error("Failed to update preference");
+    } catch (err) {
+      console.error(err.message);
+      setPreferences(prevPrefs);
+    }
+  };
+
+  const complete = async (id) => {
+    const r = reminders.find((x) => x._id === id);
     if (!r) return;
-    setReminders((prev) => prev.filter((x) => x.id !== id));
-    setCompleted((prev) => [...prev, r]);
+
     setOpenMenuId(null);
-    setToast({ text: `"${r.title}" marked done`, undoId: id });
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/reminders/${id}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ completed: true }),
+      });
+      if (!res.ok) throw new Error("Failed to complete reminder");
+
+      const updated = await res.json();
+      setReminders((prev) => prev.map((x) => (x._id === id ? updated : x)));
+      showToast(`"${r.title}" marked done`, { undoId: id });
+    } catch (err) {
+      console.error(err.message);
+    }
   };
 
-  const undoComplete = (id) => {
-    const r = completed.find((x) => x.id === id);
+  const undoComplete = async (id) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/reminders/${id}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ completed: false }),
+      });
+      if (!res.ok) throw new Error("Failed to undo");
+
+      const updated = await res.json();
+      setReminders((prev) => prev.map((x) => (x._id === id ? updated : x)));
+      setToast(null);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  const snooze = async (id) => {
+    const r = reminders.find((x) => x._id === id);
     if (!r) return;
-    setCompleted((prev) => prev.filter((x) => x.id !== id));
-    setReminders((prev) => [r, ...prev]);
-    setToast(null);
+
+    setOpenMenuId(null);
+
+    const nextDay = new Date(r.time);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/reminders/${id}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ time: nextDay.toISOString() }),
+      });
+      if (!res.ok) throw new Error("Failed to snooze");
+
+      const updated = await res.json();
+      setReminders((prev) => prev.map((x) => (x._id === id ? updated : x)));
+      showToast("Reminder snoozed to tomorrow");
+    } catch (err) {
+      console.error(err.message);
+    }
   };
 
-  const snooze = (id) => {
-    setReminders((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, time: r.time.replace("Today", "Tomorrow") } : r))
-    );
+  const removeReminder = async (id) => {
     setOpenMenuId(null);
-    setToast({ text: "Reminder snoozed to tomorrow" });
-  };
+    const prevReminders = reminders;
+    setReminders((prev) => prev.filter((x) => x._id !== id));
 
-  const removeReminder = (id) => {
-    setReminders((prev) => prev.filter((r) => r.id !== id));
-    setOpenMenuId(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/reminders/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to delete reminder");
+    } catch (err) {
+      console.error(err.message);
+      setReminders(prevReminders);
+    }
   };
 
   const openNew = () => {
@@ -121,7 +257,7 @@ export default function RemindersPage() {
 
   const openEdit = (r) => {
     setDraftTitle(r.title);
-    setDraftTime(r.time);
+    setDraftTime(toDatetimeLocalValue(r.time));
     setDraftPriority(r.priority);
     setEditing(r);
     setOpenMenuId(null);
@@ -129,28 +265,41 @@ export default function RemindersPage() {
 
   const closeModal = () => setEditing(null);
 
-  const saveDraft = () => {
-    if (!draftTitle.trim() || !draftTime.trim()) return;
+  const saveDraft = async () => {
+    if (!draftTitle.trim() || !draftTime) return;
 
-    if (editing === "new") {
-      const newReminder = {
-        id: Date.now(),
-        title: draftTitle.trim(),
-        time: draftTime.trim(),
-        priority: draftPriority,
-        icon: "task_alt",
-      };
-      setReminders((prev) => [newReminder, ...prev]);
-    } else {
-      setReminders((prev) =>
-        prev.map((r) =>
-          r.id === editing.id
-            ? { ...r, title: draftTitle.trim(), time: draftTime.trim(), priority: draftPriority }
-            : r
-        )
-      );
+    const payload = {
+      title: draftTitle.trim(),
+      time: new Date(draftTime).toISOString(),
+      priority: draftPriority,
+    };
+
+    try {
+      if (editing === "new") {
+        const res = await fetch(`${API_BASE_URL}/reminders`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...payload, icon: "task_alt" }),
+        });
+        if (!res.ok) throw new Error("Failed to create reminder");
+        const created = await res.json();
+        setReminders((prev) => [created, ...prev]);
+      } else {
+        const res = await fetch(`${API_BASE_URL}/reminders/${editing._id}`, {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error("Failed to update reminder");
+        const updated = await res.json();
+        setReminders((prev) => prev.map((r) => (r._id === updated._id ? updated : r)));
+      }
+      closeModal();
+    } catch (err) {
+      console.error(err.message);
     }
-    closeModal();
   };
 
   return (
@@ -164,64 +313,119 @@ export default function RemindersPage() {
           <div>
             <h1 className="greeting-title" style={{ fontSize: "1.5rem" }}>Reminders</h1>
             <p className="muted text-sm mt-1">
-              {dueTodayCount} due today · {upcomingCount} upcoming this week
+              {dueTodayCount} due today · {upcomingCount} upcoming
             </p>
           </div>
         </div>
-        <button className="btn-gradient meet-header-btn" onClick={openNew}>
-          <Add className="icon-sm" /> New Reminder
-        </button>
+
+        <div className="rem-header-actions">
+          <button className="btn-secondary" onClick={() => setPrefsOpen((v) => !v)}>
+            <Tune style={{ fontSize: 16 }} /> Notification Settings
+          </button>
+          <button className="btn-gradient meet-header-btn" onClick={openNew}>
+            <Add className="icon-sm" /> New Reminder
+          </button>
+        </div>
       </div>
+
+      {/* Notification preferences panel */}
+      {prefsOpen && (
+        <div className="glass-card p-6 mb-6 rem-prefs-panel">
+          <h3 className="section-title-sm mb-4">Which reminders do you want to see?</h3>
+          <div className="rem-prefs-grid">
+            {Object.entries(CATEGORY_META).map(([key, meta]) => {
+              const CatIcon = meta.Icon;
+              const enabled = preferences[key] !== false;
+              return (
+                <div key={key} className="rem-pref-row">
+                  <div className="rem-pref-info">
+                    <div className="rem-pref-icon" style={{ background: `${meta.color}1A`, color: meta.color }}>
+                      <CatIcon style={{ fontSize: 18 }} />
+                    </div>
+                    <span className="rem-pref-label">{meta.label}</span>
+                  </div>
+                  <button
+                    className={`rem-switch ${enabled ? "rem-switch-on" : ""}`}
+                    onClick={() => togglePreference(key)}
+                    role="switch"
+                    aria-checked={enabled}
+                  >
+                    <span className="rem-switch-thumb" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* List */}
       <div className="glass-card p-6">
-        {reminders.length === 0 ? (
+        {loading ? (
+          <div className="rem-empty">
+            <p className="muted">Loading reminders...</p>
+          </div>
+        ) : visibleReminders.length === 0 ? (
           <div className="rem-empty">
             <Check className="icon-violet" style={{ fontSize: 32 }} />
-            <p className="muted mt-2">All caught up — nothing left on your list.</p>
+            <p className="muted mt-2">
+              {reminders.length === 0
+                ? "All caught up — nothing on your list yet."
+                : "No reminders match your current notification settings."}
+            </p>
           </div>
         ) : (
           <ul className="rem-list">
-            {reminders.map((r) => {
-              const RowIcon = ICON_MAP[r.icon] || TaskAlt;
-              const tone = PRIORITY_TONE[r.priority] || "amber";
+            {visibleReminders.map((r) => {
+              const meta = CATEGORY_META[r.category] || CATEGORY_META.general;
+              const CatIcon = meta.Icon;
+              const tone = PRIORITY_TONE[r.priority] || "tone-amber";
+              const isLinked = !!(r.linkedNoteId || r.linkedMeetingId || r.linkedTaskId);
+
               return (
-                <li key={r.id} className="rem-item">
-                  <div className="rem-icon-box">
-                    <RowIcon className="icon-violet" style={{ fontSize: 20 }} />
+                <li key={r._id} className="rem-item">
+                  <div className="rem-icon-box" style={{ background: `${meta.color}1A` }}>
+                    <CatIcon style={{ fontSize: 20, color: meta.color }} />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="rem-title">{r.title}</div>
+                    <div className="rem-title-row">
+                      <div className="rem-title">{r.title}</div>
+                      <span className="rem-category-badge" style={{ background: `${meta.color}1A`, color: meta.color }}>
+                        {meta.label}
+                      </span>
+                    </div>
                     <div className="rem-time">
-                      <Schedule style={{ fontSize: 14 }} /> {r.time}
+                      <Schedule style={{ fontSize: 14 }} /> {formatReminderTime(r.time)}
                     </div>
                   </div>
 
-                  <span className={`rem-priority-chip ${TONE_STYLES[tone]}`}>{r.priority}</span>
+                  <span className={`rem-priority-chip ${tone}`}>{r.priority}</span>
 
-                  <button className="rem-icon-action" title="Mark done" onClick={() => complete(r.id)}>
+                  <button className="rem-icon-action" title="Mark done" onClick={() => complete(r._id)}>
                     <Check />
                   </button>
 
-                  <div className="rem-menu-wrap" ref={openMenuId === r.id ? menuRef : null}>
+                  <div className="rem-menu-wrap" ref={openMenuId === r._id ? menuRef : null}>
                     <button
                       className="rem-icon-action"
                       title="More"
-                      onClick={() => setOpenMenuId(openMenuId === r.id ? null : r.id)}
+                      onClick={() => setOpenMenuId(openMenuId === r._id ? null : r._id)}
                     >
-                      <MoreHoriz />
+                      <MoreVert />
                     </button>
 
-                    {openMenuId === r.id && (
+                    {openMenuId === r._id && (
                       <div className="rem-menu">
-                        <button className="rem-menu-item" onClick={() => snooze(r.id)}>
+                        <button className="rem-menu-item" onClick={() => snooze(r._id)}>
                           <Snooze style={{ fontSize: 16 }} /> Snooze to tomorrow
                         </button>
-                        <button className="rem-menu-item" onClick={() => openEdit(r)}>
-                          <Edit style={{ fontSize: 16 }} /> Edit
-                        </button>
-                        <button className="rem-menu-item rem-menu-item-danger" onClick={() => removeReminder(r.id)}>
+                        {!isLinked && (
+                          <button className="rem-menu-item" onClick={() => openEdit(r)}>
+                            <Edit style={{ fontSize: 16 }} /> Edit
+                          </button>
+                        )}
+                        <button className="rem-menu-item rem-menu-item-danger" onClick={() => removeReminder(r._id)}>
                           <Delete style={{ fontSize: 16 }} /> Delete
                         </button>
                       </div>
@@ -246,7 +450,7 @@ export default function RemindersPage() {
         </div>
       )}
 
-      {/* New / Edit Modal */}
+      {/* New / Edit Modal — only for standalone reminders */}
       {editing && (
         <div className="note-modal-overlay" onClick={closeModal}>
           <div className="note-modal" onClick={(e) => e.stopPropagation()}>
@@ -266,15 +470,15 @@ export default function RemindersPage() {
             />
 
             <input
+              type="datetime-local"
               className="note-input-title"
               style={{ fontWeight: 500, fontSize: "0.9375rem" }}
-              placeholder="When? e.g. Today · 04:00 PM"
               value={draftTime}
               onChange={(e) => setDraftTime(e.target.value)}
             />
 
             <div className="note-tag-picker" style={{ marginTop: 4 }}>
-              {PRIORITY_OPTIONS.map((p) => (
+              {["High", "Medium", "Low"].map((p) => (
                 <button
                   key={p}
                   className={`note-tag-option ${draftPriority === p ? "note-tag-option-active" : ""}`}
@@ -287,7 +491,7 @@ export default function RemindersPage() {
 
             <div className="note-modal-footer">
               {editing !== "new" && (
-                <button className="btn-text-danger" onClick={() => { removeReminder(editing.id); closeModal(); }}>
+                <button className="btn-text-danger" onClick={() => { removeReminder(editing._id); closeModal(); }}>
                   <Delete style={{ fontSize: 16 }} /> Delete
                 </button>
               )}
